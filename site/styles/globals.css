@@ -43,6 +43,7 @@ html {
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   overflow-x: hidden;
+  overflow-y: auto; /* ensure vertical scroll works (mouse wheel, trackpad) */
 }
 
 body {
@@ -50,6 +51,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  min-width: 0; /* allow flex/grid children to shrink on narrow viewports */
 }
 
 /* -------------------------------------------------------
@@ -264,6 +266,7 @@ body {
 html {
   scroll-behavior: auto; /* Using fast JS scroll instead */
   scroll-padding-top: 80px;
+  overflow-x: hidden; /* prevent horizontal page scroll (reinforce) */
 }
 
 html, body {
@@ -439,7 +442,8 @@ section {
   transition: height 0.3s ease, backdrop-filter 0.3s ease, background 0.3s ease;
   box-shadow: 0 4px 30px rgba(116, 6, 13, 0.2);
   border-bottom: 2px solid rgba(201, 162, 77, 0.5);
-  overflow: visible;
+  overflow-x: hidden; /* clip ::before/::after so they don't cause horizontal page overflow */
+  max-width: 100%;
 }
 
 #navbar::before {
@@ -748,7 +752,8 @@ section {
   align-items: center;
   justify-content: space-between;
   min-height: 70px;
-  overflow: visible;
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 .standalone-navbar::before {
@@ -813,6 +818,16 @@ section {
   100% {
     right: -50%;
   }
+}
+
+/* Navbar: prevent horizontal overflow on smaller laptops (e.g. 1366px, 1280px) */
+@media (max-width: 1200px) {
+  #navbar { padding: 0 24px; }
+  .standalone-navbar { padding: 12px 24px; }
+}
+@media (max-width: 1100px) {
+  .nav-link { font-size: 0.65rem; letter-spacing: 0.06em; }
+  .nav-links { gap: 10px; }
 }
 
 /* HERO IMAGE WRAPPER */
