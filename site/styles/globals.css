@@ -635,6 +635,14 @@ section {
   flex-wrap: nowrap;
 }
 
+/* Stack nav items vertically in standalone navbar to avoid stretched single-line layout */
+.standalone-navbar .nav-links {
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
 /* Separator between nav items for clearer reading */
 .nav-sep {
   width: 1px;
@@ -645,7 +653,7 @@ section {
   pointer-events: none;
 }
 .standalone-navbar .nav-sep {
-  background: rgba(201, 162, 77, 0.55);
+  display: none;
 }
 
 .nav-link {
@@ -750,15 +758,16 @@ section {
   right: 0;
   background: linear-gradient(180deg, rgba(116, 6, 13, 0.75) 0%, rgba(90, 5, 9, 0.7) 100%);
   backdrop-filter: blur(8px);
-  z-index: 9999 !important;
+  z-index: 99999 !important;
   box-shadow: 0 4px 30px rgba(116, 6, 13, 0.2);
   border-bottom: 2px solid rgba(201, 162, 77, 0.5);
   padding: 12px 30px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   min-height: 70px;
   overflow-x: hidden;
+  overflow-y: visible;
   max-width: 100%;
 }
 
@@ -4311,6 +4320,23 @@ section {
   text-shadow: 0 0 8px rgba(201, 162, 77, 0.3);
 }
 
+.ft-contact-phone {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ft-contact-phone-row {
+  display: flex;
+  align-items: baseline;
+}
+
+.ft-contact-phone-label {
+  display: inline-block;
+  width: 5.5em;
+  flex-shrink: 0;
+}
+
 .ft-call-button {
   display: inline-flex;
   align-items: center;
@@ -4336,6 +4362,35 @@ section {
 }
 
 .ft-call-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.ft-email-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #C9A24D, #D4AF37);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 12px rgba(201, 162, 77, 0.35);
+  width: fit-content;
+}
+
+.ft-email-button:hover {
+  background: linear-gradient(135deg, #D4AF37, #C9A24D);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 18px rgba(201, 162, 77, 0.45);
+}
+
+.ft-email-button svg {
   width: 16px;
   height: 16px;
 }

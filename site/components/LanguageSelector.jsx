@@ -52,7 +52,7 @@ export default function LanguageSelector() {
         </div>
       )}
       <style jsx>{`
-        .lang-selector-wrap { position: relative; }
+        .lang-selector-wrap { position: relative; z-index: 100001; }
         .lang-selector-trigger {
           display: inline-flex;
           align-items: center;
@@ -82,7 +82,7 @@ export default function LanguageSelector() {
           border: 1px solid #C9A24D;
           border-radius: 10px;
           box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-          z-index: 9999;
+          z-index: 100001;
           padding: 6px;
         }
         .lang-selector-option {
