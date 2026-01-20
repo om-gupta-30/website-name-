@@ -1,0 +1,317 @@
+export default [
+  // --- North ---
+  {
+    cityName: "Delhi",
+    stateCode: "DL",
+    x: 248,
+    y: 128,
+    contacts: [
+      { name: "Amit Singh", role: "Regional Head – North", phone: "+91 99887 66554", email: "amit.singh@example.com" },
+      { name: "Neha Kapoor", role: "Sales Manager", phone: "+91 99112 33445", email: "neha.kapoor@example.com" },
+      { name: "Rohit Verma", role: "Operations Lead", phone: "+91 98123 44556", email: "rohit.verma@example.com" },
+      { name: "Pooja Gupta", role: "Technical Support", phone: "+91 97234 55667", email: "pooja.gupta@example.com" },
+      { name: "Vikram Malhotra", role: "Logistics Coordinator", phone: "+91 96345 66778", email: "vikram.malhotra@example.com" },
+      { name: "Anjali Tandon", role: "Head Office Admin", phone: "+91 95456 77889", email: "anjali.tandon@example.com" },
+    ],
+  },
+  {
+    cityName: "Noida",
+    stateCode: "UP",
+    x: 265,
+    y: 142,
+    contacts: [
+      { name: "Arun Mehta", role: "NCR Sales Lead", phone: "+91 98761 22334", email: "arun.mehta@example.com" },
+      { name: "Divya Saxena", role: "Operations Executive", phone: "+91 97852 33445", email: "divya.saxena@example.com" },
+      { name: "Karan Bhatia", role: "Client Support", phone: "+91 96943 44556", email: "karan.bhatia@example.com" },
+    ],
+  },
+  {
+    cityName: "Lucknow",
+    stateCode: "UP",
+    x: 283,
+    y: 208,
+    contacts: [
+      { name: "Rakesh Shukla", role: "UP Regional Manager", phone: "+91 98765 11223", email: "rakesh.shukla@example.com" },
+      { name: "Sunita Dixit", role: "Sales Lead", phone: "+91 97856 22334", email: "sunita.dixit@example.com" },
+      { name: "Anil Tewari", role: "Operations", phone: "+91 96947 33445", email: "anil.tewari@example.com" },
+      { name: "Kavita Pandey", role: "Support & Admin", phone: "+91 96038 44556", email: "kavita.pandey@example.com" },
+    ],
+  },
+  {
+    cityName: "Chandigarh",
+    stateCode: "PB",
+    x: 225,
+    y: 92,
+    contacts: [
+      { name: "Harpreet Kaur", role: "Punjab Sales Manager", phone: "+91 98111 22334", email: "harpreet.kaur@example.com" },
+      { name: "Gurpreet Singh", role: "Operations", phone: "+91 97222 33445", email: "gurpreet.singh@example.com" },
+      { name: "Maninder Kaur", role: "Support & Logistics", phone: "+91 96333 44556", email: "maninder.kaur@example.com" },
+    ],
+  },
+  {
+    cityName: "Gurugram",
+    stateCode: "HR",
+    x: 228,
+    y: 138,
+    contacts: [
+      { name: "Rajiv Bansal", role: "NCR Operations Head", phone: "+91 98762 33445", email: "rajiv.bansal@example.com" },
+      { name: "Shalini Chopra", role: "Sales Lead", phone: "+91 97853 44556", email: "shalini.chopra@example.com" },
+      { name: "Naveen Ahuja", role: "Logistics & Support", phone: "+91 96944 55667", email: "naveen.ahuja@example.com" },
+      { name: "Meenakshi Goyal", role: "Accounts & Admin", phone: "+91 96035 66778", email: "meenakshi.goyal@example.com" },
+    ],
+  },
+  {
+    cityName: "Jaipur",
+    stateCode: "RJ",
+    x: 168,
+    y: 255,
+    contacts: [
+      { name: "Mahendra Sharma", role: "Rajasthan Sales Manager", phone: "+91 98763 44556", email: "mahendra.sharma@example.com" },
+      { name: "Rekha Jain", role: "Operations", phone: "+91 97854 55667", email: "rekha.jain@example.com" },
+      { name: "Suresh Bhardwaj", role: "Support & Logistics", phone: "+91 96945 66778", email: "suresh.bhardwaj@example.com" },
+    ],
+  },
+  // --- West ---
+  {
+    cityName: "Mumbai",
+    stateCode: "MH",
+    x: 183,
+    y: 398,
+    contacts: [
+      { name: "Rajesh Kumar", role: "Regional Head – West", phone: "+91 98765 43210", email: "rajesh.kumar@example.com" },
+      { name: "Priya Sharma", role: "Sales Manager", phone: "+91 91234 56789", email: "priya.sharma@example.com" },
+      { name: "Suresh Iyer", role: "Operations Lead", phone: "+91 92345 67890", email: "suresh.iyer@example.com" },
+      { name: "Anita Desai", role: "Technical Support", phone: "+91 93456 78901", email: "anita.desai@example.com" },
+      { name: "Rahul Joshi", role: "Logistics Coordinator", phone: "+91 94567 89012", email: "rahul.joshi@example.com" },
+      { name: "Kavita Patil", role: "Office Admin", phone: "+91 95678 90123", email: "kavita.patil@example.com" },
+    ],
+  },
+  {
+    cityName: "Pune",
+    stateCode: "MH",
+    x: 222,
+    y: 434,
+    contacts: [
+      { name: "Sanjay Deshmukh", role: "Pune District Manager", phone: "+91 98764 33221", email: "sanjay.deshmukh@example.com" },
+      { name: "Meera Kulkarni", role: "Sales Lead", phone: "+91 97855 44332", email: "meera.kulkarni@example.com" },
+      { name: "Vivek Pawar", role: "Operations & Support", phone: "+91 96946 55443", email: "vivek.pawar@example.com" },
+      { name: "Shruti Jadhav", role: "Logistics & Admin", phone: "+91 96037 66554", email: "shruti.jadhav@example.com" },
+    ],
+  },
+  {
+    cityName: "Nagpur",
+    stateCode: "MH",
+    x: 292,
+    y: 378,
+    contacts: [
+      { name: "Prashant Wankhede", role: "Vidarbha Sales Manager", phone: "+91 98112 55443", email: "prashant.wankhede@example.com" },
+      { name: "Swati Raut", role: "Operations", phone: "+91 97223 66554", email: "swati.raut@example.com" },
+      { name: "Manoj Dhoble", role: "Support & Logistics", phone: "+91 96334 77665", email: "manoj.dhoble@example.com" },
+    ],
+  },
+  {
+    cityName: "Ahmedabad",
+    stateCode: "GJ",
+    x: 118,
+    y: 335,
+    contacts: [
+      { name: "Chirag Patel", role: "Regional Head – Gujarat", phone: "+91 98766 55443", email: "chirag.patel@example.com" },
+      { name: "Bhavna Shah", role: "Sales Manager", phone: "+91 97857 66554", email: "bhavna.shah@example.com" },
+      { name: "Hitesh Mehta", role: "Operations Lead", phone: "+91 96948 77665", email: "hitesh.mehta@example.com" },
+      { name: "Dhara Joshi", role: "Technical Support", phone: "+91 96039 88776", email: "dhara.joshi@example.com" },
+      { name: "Rohan Trivedi", role: "Logistics Coordinator", phone: "+91 95120 99887", email: "rohan.trivedi@example.com" },
+    ],
+  },
+  {
+    cityName: "Surat",
+    stateCode: "GJ",
+    x: 138,
+    y: 388,
+    contacts: [
+      { name: "Ketan Desai", role: "Surat Sales Manager", phone: "+91 98113 66554", email: "ketan.desai@example.com" },
+      { name: "Priti Solanki", role: "Operations", phone: "+91 97224 77665", email: "priti.solanki@example.com" },
+      { name: "Niranjan Bhatt", role: "Support & Logistics", phone: "+91 96335 88776", email: "niranjan.bhatt@example.com" },
+    ],
+  },
+  {
+    cityName: "Vadodara",
+    stateCode: "GJ",
+    x: 128,
+    y: 358,
+    contacts: [
+      { name: "Mitesh Dave", role: "Vadodara Sales Lead", phone: "+91 98114 77665", email: "mitesh.dave@example.com" },
+      { name: "Pallavi Thakkar", role: "Operations & Support", phone: "+91 97225 88776", email: "pallavi.thakkar@example.com" },
+    ],
+  },
+  // --- South ---
+  {
+    cityName: "Bengaluru",
+    stateCode: "KA",
+    x: 266,
+    y: 550,
+    contacts: [
+      { name: "Sneha Reddy", role: "Regional Head – South", phone: "+91 97654 32109", email: "sneha.reddy@example.com" },
+      { name: "Vikram Nair", role: "Sales Manager", phone: "+91 96543 21098", email: "vikram.nair@example.com" },
+      { name: "Lakshmi Iyer", role: "Operations Lead", phone: "+91 95432 10987", email: "lakshmi.iyer@example.com" },
+      { name: "Arjun Krishnan", role: "Technical Support", phone: "+91 94321 09876", email: "arjun.krishnan@example.com" },
+      { name: "Preeti Murthy", role: "Logistics Coordinator", phone: "+91 93210 98765", email: "preeti.murthy@example.com" },
+      { name: "Ramesh Gowda", role: "Accounts & Admin", phone: "+91 92109 87654", email: "ramesh.gowda@example.com" },
+    ],
+  },
+  {
+    cityName: "Mysuru",
+    stateCode: "KA",
+    x: 255,
+    y: 598,
+    contacts: [
+      { name: "Kiran Kumar", role: "Mysuru Sales Manager", phone: "+91 98115 88776", email: "kiran.kumar@example.com" },
+      { name: "Latha Rao", role: "Operations", phone: "+91 97226 99887", email: "latha.rao@example.com" },
+      { name: "Sridhar Hegde", role: "Support & Logistics", phone: "+91 96336 00998", email: "sridhar.hegde@example.com" },
+    ],
+  },
+  {
+    cityName: "Chennai",
+    stateCode: "TN",
+    x: 354,
+    y: 556,
+    contacts: [
+      { name: "Karthik Sundaram", role: "Regional Head – Tamil Nadu", phone: "+91 98401 23456", email: "karthik.sundaram@example.com" },
+      { name: "Deepa Venkatesh", role: "Sales Manager", phone: "+91 98412 34567", email: "deepa.venkatesh@example.com" },
+      { name: "Ramesh Balakrishnan", role: "Operations Lead", phone: "+91 98423 45678", email: "ramesh.balakrishnan@example.com" },
+      { name: "Lakshmi Narayanan", role: "Technical Support", phone: "+91 98434 56789", email: "lakshmi.narayanan@example.com" },
+      { name: "Senthil Kumar", role: "Logistics Coordinator", phone: "+91 98445 67890", email: "senthil.kumar@example.com" },
+    ],
+  },
+  {
+    cityName: "Coimbatore",
+    stateCode: "TN",
+    x: 278,
+    y: 608,
+    contacts: [
+      { name: "Murali Krishnan", role: "Coimbatore Sales Manager", phone: "+91 98116 99887", email: "murali.krishnan@example.com" },
+      { name: "Revathi Subramanian", role: "Operations", phone: "+91 97227 00998", email: "revathi.subramanian@example.com" },
+      { name: "Selvam Perumal", role: "Support & Logistics", phone: "+91 96337 11009", email: "selvam.perumal@example.com" },
+    ],
+  },
+  {
+    cityName: "Hyderabad",
+    stateCode: "TS",
+    x: 307,
+    y: 460,
+    contacts: [
+      { name: "Srinivas Reddy", role: "Regional Head – Telangana", phone: "+91 98771 77889", email: "srinivas.reddy@example.com" },
+      { name: "Kavitha Malladi", role: "Sales Manager", phone: "+91 98772 88990", email: "kavitha.malladi@example.com" },
+      { name: "Rajesh Goud", role: "Operations Lead", phone: "+91 98773 99001", email: "rajesh.goud@example.com" },
+      { name: "Laxmi Akula", role: "Technical Support", phone: "+91 98774 00112", email: "laxmi.akula@example.com" },
+      { name: "Venkat Nanduri", role: "Logistics Coordinator", phone: "+91 98775 11223", email: "venkat.nanduri@example.com" },
+    ],
+  },
+  {
+    cityName: "Visakhapatnam",
+    stateCode: "AP",
+    x: 378,
+    y: 472,
+    contacts: [
+      { name: "Sai Kumar", role: "Vizag Sales Manager", phone: "+91 98117 00998", email: "sai.kumar@example.com" },
+      { name: "Usha Devi", role: "Operations", phone: "+91 97228 11009", email: "usha.devi@example.com" },
+      { name: "Ravi Prasad", role: "Support & Logistics", phone: "+91 96338 22110", email: "ravi.prasad@example.com" },
+    ],
+  },
+  {
+    cityName: "Kochi",
+    stateCode: "KL",
+    x: 268,
+    y: 648,
+    contacts: [
+      { name: "Sreekumar Nair", role: "Kochi Sales Manager", phone: "+91 98118 11009", email: "sreekumar.nair@example.com" },
+      { name: "Lissy George", role: "Operations", phone: "+91 97229 22110", email: "lissy.george@example.com" },
+      { name: "Thomas Mathew", role: "Support & Logistics", phone: "+91 96339 33221", email: "thomas.mathew@example.com" },
+    ],
+  },
+  {
+    cityName: "Trivandrum",
+    stateCode: "KL",
+    x: 278,
+    y: 678,
+    contacts: [
+      { name: "Venu S Nair", role: "Trivandrum Sales Lead", phone: "+91 98119 22110", email: "venu.nair@example.com" },
+      { name: "Remya Menon", role: "Operations & Support", phone: "+91 97230 33221", email: "remya.menon@example.com" },
+    ],
+  },
+  // --- East ---
+  {
+    cityName: "Kolkata",
+    stateCode: "WB",
+    x: 418,
+    y: 335,
+    contacts: [
+      { name: "Debabrata Das", role: "Regional Head – East", phone: "+91 98778 22334", email: "debabrata.das@example.com" },
+      { name: "Rupa Banerjee", role: "Sales Manager", phone: "+91 97869 33445", email: "rupa.banerjee@example.com" },
+      { name: "Somnath Ghosh", role: "Operations", phone: "+91 96950 44556", email: "somnath.ghosh@example.com" },
+      { name: "Moumita Roy", role: "Support & Logistics", phone: "+91 96041 55667", email: "moumita.roy@example.com" },
+    ],
+  },
+  {
+    cityName: "Bhubaneswar",
+    stateCode: "OR",
+    x: 398,
+    y: 418,
+    contacts: [
+      { name: "Biswajit Mohanty", role: "Odisha Sales Manager", phone: "+91 98120 33221", email: "biswajit.mohanty@example.com" },
+      { name: "Suprava Patnaik", role: "Operations & Support", phone: "+91 97231 44332", email: "suprava.patnaik@example.com" },
+    ],
+  },
+  {
+    cityName: "Patna",
+    stateCode: "BR",
+    x: 372,
+    y: 248,
+    contacts: [
+      { name: "Ramesh Yadav", role: "Bihar Sales Manager", phone: "+91 98121 44332", email: "ramesh.yadav@example.com" },
+      { name: "Poonam Kumari", role: "Operations & Support", phone: "+91 97232 55443", email: "poonam.kumari@example.com" },
+    ],
+  },
+  // --- Central ---
+  {
+    cityName: "Indore",
+    stateCode: "MP",
+    x: 218,
+    y: 355,
+    contacts: [
+      { name: "Anil Sharma", role: "Indore Sales Manager", phone: "+91 98122 55443", email: "anil.sharma@example.com" },
+      { name: "Ritu Jain", role: "Operations", phone: "+91 97233 66554", email: "ritu.jain@example.com" },
+      { name: "Ashok Gupta", role: "Support & Logistics", phone: "+91 96340 77665", email: "ashok.gupta@example.com" },
+    ],
+  },
+  {
+    cityName: "Bhopal",
+    stateCode: "MP",
+    x: 252,
+    y: 328,
+    contacts: [
+      { name: "Sanjeev Dubey", role: "Bhopal Sales Lead", phone: "+91 98123 66554", email: "sanjeev.dubey@example.com" },
+      { name: "Rashmi Shrivastava", role: "Operations & Support", phone: "+91 97234 77665", email: "rashmi.shrivastava@example.com" },
+    ],
+  },
+  {
+    cityName: "Raipur",
+    stateCode: "CT",
+    x: 332,
+    y: 395,
+    contacts: [
+      { name: "Pradeep Sahu", role: "Chhattisgarh Sales Manager", phone: "+91 98124 77665", email: "pradeep.sahu@example.com" },
+      { name: "Sunita Devi", role: "Operations & Support", phone: "+91 97235 88776", email: "sunita.devi@example.com" },
+    ],
+  },
+  // --- North-East ---
+  {
+    cityName: "Guwahati",
+    stateCode: "AS",
+    x: 468,
+    y: 272,
+    contacts: [
+      { name: "Bikram Baruah", role: "Assam Sales Manager", phone: "+91 98125 88776", email: "bikram.baruah@example.com" },
+      { name: "Monalisa Das", role: "Operations & Support", phone: "+91 97236 99887", email: "monalisa.das@example.com" },
+    ],
+  },
+];

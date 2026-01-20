@@ -1,0 +1,23 @@
+node_modules
+# Keep environment variables out of version control
+.env
+
+/lib/generated/prisma
+
+# Build outputs
+.next
+out
+dist
+build
+
+# System files
+.DS_Store
+*.swp
+*.swo
+*~
+
+# IDE files
+.vscode
+.idea
+*.sublime-project
+*.sublime-workspace

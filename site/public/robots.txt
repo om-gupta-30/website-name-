@@ -1,0 +1,7 @@
+# robots.txt
+User-agent: *
+Allow: /
+
+# Update this if you deploy under a different domain
+Sitemap: https://ynmmegaindustries.com/sitemap.xml
+
