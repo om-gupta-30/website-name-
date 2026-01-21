@@ -1,248 +1,270 @@
 # YNM Mega Industries — Corporate Website
 
-Corporate website for **YNM Mega Industries Pvt Ltd**, a manufacturer and exporter of paints, metal fabrications, and school furniture. The site showcases products, clients, team, and provides contact, careers, and an AI chatbot.
+Corporate website for **YNM Mega Industries Pvt Ltd**, a manufacturer and exporter of paints, metal fabrications, and school furniture. The site showcases products, clients, team, careers, contact, an AI chatbot, and an interactive India presence map.
 
 ---
 
-## What This Application Is
+## Project Summary
 
-- **Company:** YNM Mega Industries Pvt Ltd (est. 2013)
-- **Products:** Industrial & decorative paints, metal fabrications, school & educational furniture
-- **Purpose:** Public site for brand, products, clients, team, careers, contact, and support
+| | |
+|---|---|
+| **Company** | YNM Mega Industries Pvt Ltd |
+| **Established** | 2013 |
+| **Tagline** | Manufacturing & Export Excellence Since 2013 |
+| **Purpose** | Public site for brand, products, clients, team, careers, contact, and support |
 
 **Main capabilities:**
-- Browse products by category with detail pages
-- View client/partner logos and testimonials
-- Read employee testimonials and team info
-- Submit contact and career applications
-- Use an AI chatbot (Google Gemini) for company/product questions
-- Multilingual UI (English and Hindi) with a first-time language modal
-- Interactive India presence map with state-wise contacts on the Contact page
-- Foreign collaborations, investor relations, and legal pages (privacy, terms)
+- Browse products by category (Paints, Metal Fabrication, School Furniture) with detail pages  
+- View client/partner logos and testimonials  
+- Employee testimonials and team info  
+- Contact form → saved to **Google Sheets**  
+- Career applications with **PDF resume upload** → email to HR (Nodemailer / Gmail / SendGrid)  
+- **AI chatbot** (Google Gemini) for company/product questions in English or Hindi  
+- **Multilingual UI** (English, Hindi, Bengali, Telugu, Marathi, Tamil, Gujarati, Kannada, Malayalam, Punjabi, Odia, Urdu) with first-time language modal  
+- **Interactive India presence map** with state-wise contacts on the Contact page  
+- Foreign collaborations, investor relations, privacy policy, and terms of use  
 
 ---
 
-## How It Is Made
-
-### Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |-------|------------|
-| Framework | **Next.js 15** (React 19) |
-| Styling | **Tailwind CSS**, global CSS in `styles/globals.css` |
-| Fonts | Montserrat (variable, self-hosted in `public/fonts/`) |
-| Email (Careers) | **Nodemailer**; optional Gmail or SendGrid |
-| Contact storage | **Google Sheets** (Sheets API via `googleapis`) |
-| Chat | **Google Gemini** (`GOOGLE_GEMINI_API_KEY`) |
-| Forms (Careers) | **Formidable** (multipart), **pdf-parse** (resume) |
+| **Framework** | Next.js 15 (React 19) |
+| **Styling** | Tailwind CSS, global CSS (`styles/globals.css`) |
+| **Fonts** | Montserrat (variable, self-hosted in `public/fonts/`) |
+| **Contact form** | Google Sheets API (`googleapis`) |
+| **Careers form** | Formidable (multipart), **pdf-parse** (resume validation), **Nodemailer** |
+| **Chatbot** | Google Gemini API (`GOOGLE_GEMINI_API_KEY`) |
+| **Email (Careers)** | Nodemailer — SMTP, Gmail, or SendGrid |
 
-### Project Layout
+### Dependencies (production)
+
+- `next` 15.0.7  
+- `react` 19, `react-dom` 19  
+- `formidable` — multipart form parsing (resume upload)  
+- `googleapis` — Google Sheets for contact submissions  
+- `nodemailer` — career application emails  
+- `pdf-parse` — PDF validation (e.g. password-protected check)  
+
+### Dev dependencies
+
+- `tailwindcss`, `postcss`, `eslint`, `eslint-config-next`  
+
+**Node:** 20.x (see `package.json` `engines`)
+
+---
+
+## Project Structure
 
 The app lives in the **`site/`** directory. All commands below assume you are in `site/`.
 
 ```
 YNM website/
-├── site/                      # Application root (run npm here)
-│   ├── components/            # React components
-│   ├── contexts/              # React context (e.g. LanguageContext)
-│   ├── lib/                   # Data and helpers
-│   ├── pages/                 # Next.js pages and API routes
-│   ├── public/                # Static assets (images, fonts, favicon, etc.)
-│   ├── styles/                # globals.css
-│   ├── .eslintrc.json
+├── site/                          # Application root
+│   ├── components/                # React components
+│   │   ├── Navbar.jsx
+│   │   ├── Footer.jsx
+│   │   ├── Hero.jsx
+│   │   ├── USPSection.jsx
+│   │   ├── ProductsSection.jsx
+│   │   ├── BrandsSection.jsx
+│   │   ├── EmployeesSection.jsx
+│   │   ├── TestimonialsSection.jsx
+│   │   ├── IndiaPresenceMap.jsx   # Contact page: state-wise India map
+│   │   ├── LanguageSelector.jsx
+│   │   ├── FirstTimeLanguageModal.jsx
+│   │   ├── Chatbot.jsx            # AI chatbot (Gemini)
+│   │   ├── Mascot.jsx             # Floating mascot with facts
+│   │   └── FloatingSocialMedia.jsx
+│   ├── contexts/
+│   │   └── LanguageContext.jsx    # EN/Hi + 10 more languages, localStorage
+│   ├── lib/
+│   │   ├── translations.js        # All UI strings (nav, hero, footer, etc.)
+│   │   ├── employeesData.js       # Employee testimonials + photo paths
+│   │   ├── chatbotData.js         # FAQs, product catalog, contact links for chatbot
+│   │   ├── indiaContacts.js       # State-wise contact entries for India map
+│   │   └── indiaMapPaths.js       # SVG path data for India map
+│   ├── pages/
+│   │   ├── _app.js                # LanguageProvider, FirstTimeLanguageModal, Mascot, Chatbot, FloatingSocialMedia
+│   │   ├── _document.js
+│   │   ├── _error.js, 404.js
+│   │   ├── index.js               # Home
+│   │   ├── about/, careers/, clients/, contact/
+│   │   ├── foreign-collaborations/, investor-relations/, our-team/
+│   │   ├── privacy/, terms/
+│   │   ├── products/index.jsx     # Product catalog
+│   │   ├── products/[productId].jsx
+│   │   └── api/
+│   │       ├── contact/submit.js  # → Google Sheets
+│   │       ├── careers/submit.js  # multipart + PDF → Nodemailer
+│   │       └── chat/gemini.js     # → Google Gemini
+│   ├── public/
+│   │   ├── assets/                # brand-logos, employeephotos, product-*, gallery-*, hero, mascot, logos, team-member-*
+│   │   ├── fonts/Montserrat[wght].ttf
+│   │   ├── favicon.ico, robots.txt, sitemap.xml
+│   ├── styles/globals.css
 │   ├── next.config.mjs
-│   ├── package.json
 │   ├── tailwind.config.js
-│   └── postcss.config.mjs
+│   ├── postcss.config.mjs
+│   ├── jsconfig.json              # Path alias: @/* → ./*
+│   └── package.json
 ├── .gitignore
 └── README.md
 ```
 
-### Routing and Pages
+---
+
+## Pages & Routes
 
 | Route | Description |
 |-------|-------------|
 | `/` | Home: Hero, USPs, products, brands, employees, testimonials |
-| `/about` | About, gallery (facility, production, products) |
-| `/products` | Product catalog by category (paints, fabrication, furniture) |
-| `/products/[productId]` | Product detail |
-| `/clients` | Client/partner cards with logos, testimonials, and products supplied |
-| `/our-team` | Employee testimonials and team section |
-| `/careers` | Job listings and application form (resume upload) |
-| `/contact` | Contact form and India presence map (state-wise contacts) |
+| `/about` | About, gallery (facility, production, warehouse) |
+| `/products` | Product catalog: Paints, Metal Fabrication, School Furniture |
+| `/products/[productId]` | Product detail (e.g. `p1`, `f1`, `s1`) |
+| `/clients` | Client/partner logos and testimonials |
+| `/our-team` | Employee testimonials and team |
+| `/careers` | Job listings and application form (resume PDF upload) |
+| `/contact` | Contact form and **India presence map** (state-wise contacts) |
 | `/foreign-collaborations` | International partnerships by region |
 | `/investor-relations` | Investor information |
 | `/privacy` | Privacy policy |
 | `/terms` | Terms and conditions |
-| `/404` | Custom 404 page |
-
-### API Routes
-
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/api/contact/submit` | POST | Contact form → Google Sheets (Sheets API) |
-| `/api/careers/submit` | POST | Career form + resume → email (Nodemailer/Gmail/SendGrid), optional reCAPTCHA |
-| `/api/chat/gemini` | POST | Chatbot → Google Gemini; supports `message`, `conversationHistory`, `language` |
-
-### Components
-
-- **Layout / global:** `Navbar`, `Footer`, `Hero`, `FirstTimeLanguageModal`, `LanguageSelector`, `FloatingSocialMedia`, `Mascot`, `Chatbot`
-- **Sections:** `USPSection`, `ProductsSection`, `BrandsSection`, `EmployeesSection`, `TestimonialsSection`
-- **Other:** `IndiaPresenceMap` (contact page)
-
-### Data and Config
-
-- **`lib/translations.js`** — EN/HI copy for nav, sections, footer, etc.
-- **`lib/employeesData.js`** — Employee testimonials (name, role, department, quote, photo path).
-- **`lib/chatbotData.js`** — Chatbot product catalog, FAQs, and contact-related links.
-- **`lib/indiaContacts.js`** — State-wise contact entries for the India map.
-- **`lib/indiaMapPaths.js`** — SVG path data for the India map.
-
-### Assets (in `site/public/`)
-
-- **`assets/brand-logos/`** — Client/partner logos (used on Home and Clients).
-- **`assets/employeephotos/`** — Employee photos for the “What our employees say” section.
-- **`assets/`** — Product images (`product-*.png`), gallery (`gallery-*.jpg`), `hero-image.png`, `mascot.png`, `logo-navbar.jpg`, `logo-footer.jpg`, `team-member-01.png`–`team-member-10.png` (fallbacks).
-- **`fonts/Montserrat[wght].ttf`** — Primary font.
-- **`favicon.ico`**, **`robots.txt`**, **`sitemap.xml`**.
+| `/404` | Custom 404 |
 
 ---
 
-## What You Need to Run It
+## API Routes
 
-### Prerequisites
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/contact/submit` | POST | Contact form → **Google Sheets** (Sheets API). Body: `name`, `email`, `phone`, `company`, `subject`, `message`. |
+| `/api/careers/submit` | POST | **Multipart**: `name`, `email`, `phone`, `position`, `experience`, `coverLetter`, `resume` (PDF), `captchaAnswer`, `captchaQuestion`, `recaptchaToken`. Validates PDF (type, size ≤5MB, no password), rate limit (3/15 min per IP), reCAPTCHA. Sends confirmation to applicant and HR notification with resume attachment via **Nodemailer** (SMTP / Gmail / SendGrid). |
+| `/api/chat/gemini` | POST | Body: `{ message, conversationHistory?, language?: "en" \| "hi" }`. Uses **Google Gemini** (tries `gemini-2.5-flash`, `gemini-2.0-flash`, etc.) with company context. Returns `{ response }`. |
 
-- **Node.js** 20.x (see `package.json` `engines`)
-- **npm** (or yarn)
+---
 
-### 1. Install dependencies
+## Environment Variables
+
+Create **`site/.env.local`** and set the variables used by the features you enable.
+
+### Contact form (Google Sheets)
+
+- `GOOGLE_SHEET_ID` — ID of the Google Sheet  
+- `GOOGLE_SERVICE_ACCOUNT_EMAIL` — Service account email  
+- `GOOGLE_PRIVATE_KEY` — Service account private key (use `\n` for newlines in env)  
+
+### Chatbot (Gemini)
+
+- `GOOGLE_GEMINI_API_KEY` — Gemini API key  
+
+### Careers (email)
+
+**One of:**
+
+- **SMTP:** `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`; optionally `SMTP_SECURE`, `SMTP_REJECT_UNAUTHORIZED`  
+- **Gmail:** `GMAIL_USER`, `GMAIL_APP_PASSWORD`  
+- **SendGrid:** `SENDGRID_API_KEY`  
+
+**Optional:**
+
+- `HR_EMAIL` — Where to send applications (default: `hr@ynmsafety.com`)  
+- `CAREERS_NOREPLY_FROM` — “From” address for automated emails  
+- `RECAPTCHA_SECRET_KEY` — reCAPTCHA v2/v3 secret (test key used when unset)  
+
+---
+
+## How to Run
+
+### 1. Install
 
 ```bash
 cd site
 npm install
 ```
 
-### 2. Environment variables
+### 2. Environment
 
-Create `site/.env.local` and set at least the variables used by the features you enable.
+Create `site/.env.local` with the variables above for Contact, Chat, and Careers as needed.
 
-**Contact form (Google Sheets):**
+### 3. Commands
 
-- `GOOGLE_SHEET_ID` — ID of the Google Sheet
-- `GOOGLE_SERVICE_ACCOUNT_EMAIL` — Service account email
-- `GOOGLE_PRIVATE_KEY` — Service account private key (multiline: use `\n` for newlines when stored in env)
-
-**Chatbot (Gemini):**
-
-- `GOOGLE_GEMINI_API_KEY` — Gemini API key
-
-**Careers form (email):**
-
-Choose one of:
-
-- **SMTP:** `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`; optionally `SMTP_SECURE`, `SMTP_REJECT_UNAUTHORIZED`
-- **Gmail:** `GMAIL_USER`, `GMAIL_APP_PASSWORD`
-- **SendGrid:** `SENDGRID_API_KEY`
-
-Optional for careers:
-
-- `HR_EMAIL` — Where to send applications (default in code: `hr@ynmsafety.com`)
-- `CAREERS_NOREPLY_FROM` — “From” address
-- `RECAPTCHA_SECRET_KEY` — reCAPTCHA v2/v3 secret (if you use it; a test key is used when unset)
-
-### 3. Run
-
-**Development:**
-
-```bash
-npm run dev
-```
-
-- App: [http://localhost:3000](http://localhost:3000)
-
-**Production build and run:**
-
-```bash
-npm run build
-npm start
-```
-
-**Lint:**
-
-```bash
-npm run lint
-```
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Dev server → [http://localhost:3000](http://localhost:3000) |
+| `npm run build` | Production build |
+| `npm start` | Run production server (after `npm run build`) |
+| `npm run lint` | Run ESLint |
 
 ---
 
-## Build and Deployment
+## Styling & Theming
 
-- **`npm run build`** — Must be run from the `site/` directory. Produces a production build.
-- **Deployment:** Needs a **Node.js server** (e.g. Vercel, a VPS, or a PaaS). API routes (`/api/contact/submit`, `/api/careers/submit`, `/api/chat/gemini`) do not work with a purely static export.
-- **Vercel:** Set the project **Root Directory** to `site` so `package.json` and `next.config.mjs` are found.
-- **Images:** `next.config.mjs` uses `images.unoptimized: true`; no Image Optimization API is required.
+- **Tailwind** in `tailwind.config.js`: custom colors (`primary`, `secondary`, `accent`, `dark`, `light`, `muted`), `fontFamily.brand`, `boxShadow.premium`.  
+- **`styles/globals.css`**:  
+  - `@font-face` for Montserrat (variable).  
+  - CSS variables: `--deep-maroon`, `--rich-wine`, `--antique-gold`, `--warm-champagne`, `--soft-ivory`, and derived/section gradients.  
+  - Global resets, scroll behavior, and animations (hero, services, etc.).  
 
 ---
 
-## Feature Summary
+## Data & Content
+
+- **`lib/translations.js`** — `LANGUAGES` and `translations` for 12 languages; `en` and `hi` have full copy; others can use `en` as fallback. Used for nav, hero, footer, FirstTimeLanguageModal, etc.  
+- **`lib/employeesData.js`** — Employee name, role, department, quote, photo path (`/assets/employeephotos/...`).  
+- **`lib/chatbotData.js`** — `faqData`, `productCatalog` (paints, fabrication, furniture), `contactLinks`.  
+- **`lib/indiaContacts.js`** — State code → `{ stateName, contacts: [{ name, role, phone, email }] }` for the India map.  
+- **`lib/indiaMapPaths.js`** — SVG path data for Indian states (used by `IndiaPresenceMap`).  
+
+Product catalog is also defined in `pages/products/index.jsx` (categories and product details with `id`, `name`, `desc`, `image`, `specs`).
+
+---
+
+## Assets (`site/public/`)
+
+- **`assets/brand-logos/`** — Client/partner logos (Home, Clients).  
+- **`assets/employeephotos/`** — Employee photos.  
+- **`assets/`** — `product-*.png`, `gallery-*.jpg`, `hero-image.png`, `mascot.png`, `logo-navbar.jpg`, `logo-footer.jpg`, `team-member-01.png`–`team-member-10.png` (fallbacks).  
+- **`fonts/Montserrat[wght].ttf`** — Primary font.  
+- **`favicon.ico`**, **`robots.txt`**, **`sitemap.xml`**.  
+
+`next.config.mjs` uses `images.unoptimized: true`; no Image Optimization API is required.
+
+---
+
+## Deployment
+
+- **`npm run build`** must be run from `site/`.  
+- Needs a **Node.js server** (e.g. Vercel, VPS, PaaS). API routes do **not** work with a purely static export.  
+- **Vercel:** set the project **Root Directory** to `site`.  
+- Configure the same env vars in your host’s environment.  
+
+---
+
+## Feature Overview
 
 | Feature | Where | Notes |
 |---------|-------|-------|
-| Multilingual (EN/Hi) | Global | `LanguageContext`, `translations.js`, `FirstTimeLanguageModal` |
-| AI chatbot | Global (floating) | Gemini; `chatbotData.js` for products/FAQs |
+| Multilingual (12 languages) | Global | `LanguageContext`, `translations.js`, `FirstTimeLanguageModal` |
+| AI chatbot | Global (floating) | Gemini; `chatbotData.js` for products/FAQs; `language` for EN/Hi |
 | Mascot | Global (floating) | Rotating facts, minimizable |
 | Contact form | `/contact` | Saves to Google Sheets |
 | India map | `/contact` | `IndiaPresenceMap`, `indiaContacts`, `indiaMapPaths` |
-| Careers form | `/careers` | Resume upload, email to HR, optional reCAPTCHA |
-| Employee section | `/`, `/our-team` | `EmployeesSection` + `employeesData.js`; Managing Director card has distinct styling on home; **hover pop-out** (lift `-20px`, scale `1.04`, stronger shadow, `z-index: 20`); neon particles, shimmer, photo glow/border, and accents kept but reduced for performance on lower-end devices |
-| Client logos & testimonials | `/`, `/clients` | `BrandsSection`, `BrandsSection`-style data on Clients page |
-| Product catalog | `/`, `/products`, `/products/[id]` | Categories and detail pages |
-| Foreign collaborations | `/foreign-collaborations` | Region-based partnership blocks |
+| Careers form | `/careers` | Resume PDF upload, rate limit, reCAPTCHA, math CAPTCHA, confirmation + HR emails |
+| Employee section | `/`, `/our-team` | `EmployeesSection` + `employeesData.js` |
+| Client logos & testimonials | `/`, `/clients` | `BrandsSection` and Clients page |
+| Product catalog | `/`, `/products`, `/products/[id]` | Categories: Paints, Fabrication, Furniture |
 
 ---
 
-## Recent implementations
+## Path Aliases
 
-### “What our employees say” (EmployeesSection) — UI and performance
-
-- **Hover pop-out:** On hover, cards **pop out** with:
-  - **Lift:** `translateY(-20px)` (increased from -10px).
-  - **Scale:** `scale(1.04)` so the card grows toward the viewer.
-  - **Shadow:** Layered box-shadow (`0 28px 60px`, `0 0 40px` gold glow, `0 12px 24px`) so the card reads clearly above the grid.
-  - **Motion:** `0.35s cubic-bezier(0.34, 1.56, 0.64, 1)` for a slight overshoot; `z-index: 20` so the hovered card stays on top when it overlaps neighbors.
-- **Effects retained, toned down:** Neon particles, card shimmer, card background pulse, photo gradient border, photo glow, quote icon motion, and corner accent stay, but are lighter and slower to improve performance (e.g. on Windows laptops):
-  - Neon: `neonFloat` only (no `neonPulse`), 14s, opacity 0.5, smaller box-shadows.
-  - Shimmer: runs once on hover (2s), lower opacity.
-  - Photo: `photoBreath` / `photoSectionFloat` / `photoWrapperPulse` slowed (5–8s), smaller movement and scale (e.g. 1.01–1.02).
-  - Glow and border: reduced opacity and scale; `photoBorderRotate` and `accentRotate` slowed (4–5s).
-  - Line under header: `lineShimmer` at 6s with a lighter shadow.
-- **Card entrance:** Simple fade-in; staggered `animationDelay` per card kept.
-
-### ESLint, `next/link`, and React best practices
-
-- **ESLint:** `site/.eslintrc.json` extends `next/core-web-vitals` so `npm run lint` runs without prompts. The build runs lint and type checks; both must pass.
-- **`next/link`:** Internal links use `<Link href="...">` instead of `<a href="...">` (404, `_error`, our-team CTA) for client-side navigation.
-- **Unescaped entities:** Apostrophes and quotes in JSX text are escaped (`&apos;`, `&quot;`) where required by `react/no-unescaped-entities` (careers, contact, foreign-collaborations, our-team, privacy, terms, products, EmployeesSection, IndiaPresenceMap, TestimonialsSection).
-- **`lib/indiaContacts.js`:** Default export changed from an anonymous object to a named constant (`indiaContacts`) to satisfy `import/no-anonymous-default-export`.
+- **`@/*`** → `./*` (via `jsconfig.json`).  
+- Imports use e.g. `@/components/...`, `@/lib/...`, `@/contexts/...`, `@/styles/...`.
 
 ---
 
-## Troubleshooting
-
-- **Build fails:** Run `npm run build` from **`site/`**, not the repo root. Ensure Node 20.x.
-- **APIs 404 or 500:** Confirm `.env.local` (or your deployment env) has the keys used by each API. Contact needs Sheets; Chat needs `GOOGLE_GEMINI_API_KEY`; Careers needs one of SMTP/Gmail/SendGrid (and optionally reCAPTCHA).
-- **Contact form “Google Sheets not configured”:** Set `GOOGLE_SHEET_ID`, `GOOGLE_SERVICE_ACCOUNT_EMAIL`, and `GOOGLE_PRIVATE_KEY` correctly.
-- **Chatbot “Gemini API key not configured”:** Set `GOOGLE_GEMINI_API_KEY`.
-
----
-
-## Repo Structure (after cleanup)
-
-- **Root:** `README.md`, `.gitignore`. No `brand logos/` or `employeephotos/` at root; those live under `site/public/assets/`.
-- **Removed as unused:** `MissionSection`, `ServicesSection`, `CTAButton`, `lib/sound.js`, `lib/indiaCityContacts.js`, `styles/theme.js`, `public/assets/client-logo-*.png` (8 files). All assets required to run the app are under `site/public/`.
-
----
-
-## License and Ownership
+## License & Ownership
 
 Proprietary to **YNM Mega Industries Pvt Ltd**. All rights reserved.
