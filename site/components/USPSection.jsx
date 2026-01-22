@@ -25,9 +25,9 @@ function USPSection({ uspData: propUspData }) {
         description: benefit.description,
       }))
     : benefitsFromT.length > 0 ? benefitsFromT : [{
-        id: "manufacturing", title: "Advanced Manufacturing..", icon: "🏭",
+        id: "manufacturing", title: "Advanced Manufacturing", icon: "🏭",
         description: "YNM Mega Industries operates advanced manufacturing facilities delivering high-quality industrial paints, precision metal fabrication, and engineered school furniture. As a trusted global manufacturer, we combine modern machinery, skilled expertise, and efficient processes to serve worldwide industrial and infrastructure projects."
-      }, { id: "certified", title: "Quality Certified..", icon: "✓", description: "At YNM Mega Industries, quality is our foundation. All our products including industrial paints, fabrication components, and school furniture are manufactured under ISO 9001:2015 certified quality systems, ensuring durability, safety, and consistent performance for global markets." },
+      }, { id: "certified", title: "Quality Certified", icon: "✓", description: "At YNM Mega Industries, quality is our foundation. All our products including industrial paints, fabrication components, and school furniture are manufactured under ISO 9001:2015 certified quality systems, ensuring durability, safety, and consistent performance for global markets." },
       { id: "export", title: "Global Export Network", icon: "🌍", description: "YNM Mega Industries is a reliable global exporter of industrial paints, metal fabrication products, safety solutions, and school furniture. We supply to clients across Asia, Africa, the Middle East, and international markets with efficient logistics, compliance, and timely delivery." },
       { id: "customization", title: "Custom Solutions", icon: "🎨", description: "We specialize in customized manufacturing solutions including bespoke paint formulations, custom metal fabrication, and made-to-order school furniture. YNM Mega Industries supports global clients with flexible production, technical expertise, and project-specific solutions." }];
 

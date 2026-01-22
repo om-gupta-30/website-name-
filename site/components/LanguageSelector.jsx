@@ -7,7 +7,9 @@ import { LANGUAGES } from "@/lib/translations";
 export default function LanguageSelector() {
   const { language, changeLanguage } = useLanguage();
   const [open, setOpen] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, right: 0 });
   const ref = useRef(null);
+  const triggerRef = useRef(null);
 
   useEffect(() => {
     const onOut = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
@@ -15,11 +17,22 @@ export default function LanguageSelector() {
     return () => document.removeEventListener("click", onOut);
   }, []);
 
+  useEffect(() => {
+    if (open && triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + window.scrollY + 6,
+        right: window.innerWidth - rect.right
+      });
+    }
+  }, [open]);
+
   const current = LANGUAGES.find((l) => l.code === language) || LANGUAGES[0];
 
   return (
     <div className="lang-selector-wrap" ref={ref}>
       <button
+        ref={triggerRef}
         type="button"
         className="lang-selector-trigger"
         onClick={() => setOpen((o) => !o)}
@@ -33,7 +46,11 @@ export default function LanguageSelector() {
         </svg>
       </button>
       {open && (
-        <div className="lang-selector-dropdown" role="listbox">
+        <div 
+          className="lang-selector-dropdown" 
+          role="listbox"
+          style={{ top: `${dropdownPosition.top}px`, right: `${dropdownPosition.right}px` }}
+        >
           {LANGUAGES.map(({ code, name }) => (
             <button
               key={code}
@@ -52,7 +69,7 @@ export default function LanguageSelector() {
         </div>
       )}
       <style jsx>{`
-        .lang-selector-wrap { position: relative; z-index: 100001; }
+        .lang-selector-wrap { position: relative; z-index: 999999; }
         .lang-selector-trigger {
           display: inline-flex;
           align-items: center;
@@ -71,10 +88,7 @@ export default function LanguageSelector() {
         .lang-selector-chevron { transition: transform 0.2s; }
         .lang-selector-chevron.open { transform: rotate(180deg); }
         .lang-selector-dropdown {
-          position: absolute;
-          top: 100%;
-          right: 0;
-          margin-top: 6px;
+          position: fixed;
           min-width: 160px;
           max-height: 280px;
           overflow-y: auto;
@@ -82,7 +96,7 @@ export default function LanguageSelector() {
           border: 1px solid #C9A24D;
           border-radius: 10px;
           box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-          z-index: 100001;
+          z-index: 999999;
           padding: 6px;
         }
         .lang-selector-option {

@@ -23,12 +23,12 @@ const galleryImages = [
 const aboutSectionContent = [
   {
     icon: "🏭",
-    title: "Advanced Manufacturing..",
+    title: "Advanced Manufacturing",
     description: "YNM Mega Industries operates advanced manufacturing facilities delivering high-quality industrial paints, precision metal fabrication, and engineered school furniture. As a trusted global manufacturer, we combine modern machinery, skilled expertise, and efficient processes to serve worldwide industrial and infrastructure projects."
   },
   {
     icon: "✅",
-    title: "Quality Certified..",
+    title: "Quality Certified",
     description: "At YNM Mega Industries, quality is our foundation. All our products including industrial paints, fabrication components, and school furniture are manufactured under ISO 9001:2015 certified quality systems, ensuring durability, safety, and consistent performance for global markets."
   },
   {
