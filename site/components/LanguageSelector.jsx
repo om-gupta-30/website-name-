@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LANGUAGES } from "@/lib/translations";
 
@@ -10,12 +11,20 @@ export default function LanguageSelector() {
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, right: 0 });
   const ref = useRef(null);
   const triggerRef = useRef(null);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
-    const onOut = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
-    document.addEventListener("click", onOut);
-    return () => document.removeEventListener("click", onOut);
-  }, []);
+    const onOut = (e) => { 
+      if (ref.current && !ref.current.contains(e.target) && 
+          dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+    if (open) {
+      document.addEventListener("click", onOut);
+      return () => document.removeEventListener("click", onOut);
+    }
+  }, [open]);
 
   useEffect(() => {
     if (open && triggerRef.current) {
@@ -29,47 +38,52 @@ export default function LanguageSelector() {
 
   const current = LANGUAGES.find((l) => l.code === language) || LANGUAGES[0];
 
-  return (
-    <div className="lang-selector-wrap" ref={ref}>
-      <button
-        ref={triggerRef}
-        type="button"
-        className="lang-selector-trigger"
-        onClick={() => setOpen((o) => !o)}
-        aria-expanded={open}
-        aria-haspopup="listbox"
-        aria-label={`Language: ${current.name}. Choose language`}
-      >
-        <span className="lang-selector-current">{current.name}</span>
-        <svg className={`lang-selector-chevron ${open ? "open" : ""}`} width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden>
-          <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </button>
-      {open && (
-        <div 
-          className="lang-selector-dropdown" 
-          role="listbox"
-          style={{ top: `${dropdownPosition.top}px`, right: `${dropdownPosition.right}px` }}
+  const dropdownContent = open && (
+    <div 
+      ref={dropdownRef}
+      className="lang-selector-dropdown" 
+      role="listbox"
+      style={{ top: `${dropdownPosition.top}px`, right: `${dropdownPosition.right}px` }}
+    >
+      {LANGUAGES.map(({ code, name }) => (
+        <button
+          key={code}
+          type="button"
+          role="option"
+          aria-selected={language === code}
+          className={`lang-selector-option ${language === code ? "active" : ""}`}
+          onClick={() => {
+            changeLanguage(code);
+            setOpen(false);
+          }}
         >
-          {LANGUAGES.map(({ code, name }) => (
-            <button
-              key={code}
-              type="button"
-              role="option"
-              aria-selected={language === code}
-              className={`lang-selector-option ${language === code ? "active" : ""}`}
-              onClick={() => {
-                changeLanguage(code);
-                setOpen(false);
-              }}
-            >
-              {name}
-            </button>
-          ))}
-        </div>
-      )}
+          {name}
+        </button>
+      ))}
+    </div>
+  );
+
+  return (
+    <>
+      <div className="lang-selector-wrap" ref={ref}>
+        <button
+          ref={triggerRef}
+          type="button"
+          className="lang-selector-trigger"
+          onClick={() => setOpen((o) => !o)}
+          aria-expanded={open}
+          aria-haspopup="listbox"
+          aria-label={`Language: ${current.name}. Choose language`}
+        >
+          <span className="lang-selector-current">{current.name}</span>
+          <svg className={`lang-selector-chevron ${open ? "open" : ""}`} width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden>
+            <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+      </div>
+      {typeof window !== 'undefined' && createPortal(dropdownContent, document.body)}
       <style jsx>{`
-        .lang-selector-wrap { position: relative; z-index: 999999; }
+        .lang-selector-wrap { position: relative; }
         .lang-selector-trigger {
           display: inline-flex;
           align-items: center;
@@ -88,7 +102,7 @@ export default function LanguageSelector() {
         .lang-selector-chevron { transition: transform 0.2s; }
         .lang-selector-chevron.open { transform: rotate(180deg); }
         .lang-selector-dropdown {
-          position: fixed;
+          position: fixed !important;
           min-width: 160px;
           max-height: 280px;
           overflow-y: auto;
@@ -96,7 +110,7 @@ export default function LanguageSelector() {
           border: 1px solid #C9A24D;
           border-radius: 10px;
           box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-          z-index: 999999;
+          z-index: 999999 !important;
           padding: 6px;
         }
         .lang-selector-option {
@@ -116,6 +130,6 @@ export default function LanguageSelector() {
         .lang-selector-option:hover { background: rgba(201,162,77,0.2); color: #F7F3EA; }
         .lang-selector-option.active { background: rgba(201,162,77,0.3); color: #C9A24D; }
       `}</style>
-    </div>
+    </>
   );
 }
