@@ -323,7 +323,7 @@ export default function Hero({ heroData: propHeroData, navLinks: propNavLinks })
           <Link href="/" className="nav-brand">
             <div className="nav-logo-wrapper hero-logo-heartbeat">
               <Image 
-                src="/assets/logo1.jpg" 
+                src="/assets/logo-navbar.jpg" 
                 alt="YNM Mega Industries logo" 
                 width={50}
                 height={50}

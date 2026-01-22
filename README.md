@@ -4,6 +4,33 @@ Corporate website for **YNM Mega Industries Pvt Ltd**, a manufacturer and export
 
 ---
 
+## Quick Start
+
+1. **Navigate to the site directory:**
+   ```bash
+   cd site
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables:**
+   Create `site/.env.local` with your API keys (see [Environment Variables](#environment-variables) section below)
+
+4. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
+
+5. **Open your browser:**
+   Visit [http://localhost:3000](http://localhost:3000)
+
+For production deployment, see the [Deployment](#deployment) section.
+
+---
+
 ## Project Summary
 
 | | |
@@ -57,60 +84,89 @@ Corporate website for **YNM Mega Industries Pvt Ltd**, a manufacturer and export
 
 ## Project Structure
 
-The app lives in the **`site/`** directory. All commands below assume you are in `site/`.
+The application is a Next.js project located in the **`site/`** directory. All commands below assume you are in `site/`.
 
 ```
 YNM website/
-├── site/                          # Application root
-│   ├── components/                # React components
-│   │   ├── Navbar.jsx
-│   │   ├── Footer.jsx
-│   │   ├── Hero.jsx
-│   │   ├── USPSection.jsx
-│   │   ├── ProductsSection.jsx
-│   │   ├── BrandsSection.jsx
-│   │   ├── EmployeesSection.jsx
-│   │   ├── TestimonialsSection.jsx
-│   │   ├── IndiaPresenceMap.jsx   # Contact page: state-wise India map
-│   │   ├── LanguageSelector.jsx
-│   │   ├── FirstTimeLanguageModal.jsx
-│   │   ├── Chatbot.jsx            # AI chatbot (Gemini)
-│   │   ├── Mascot.jsx             # Floating mascot with facts
-│   │   └── FloatingSocialMedia.jsx
-│   ├── contexts/
-│   │   └── LanguageContext.jsx    # EN/Hi + 10 more languages, localStorage
-│   ├── lib/
-│   │   ├── translations.js        # All UI strings (nav, hero, footer, etc.)
-│   │   ├── employeesData.js       # Employee testimonials + photo paths
-│   │   ├── chatbotData.js         # FAQs, product catalog, contact links for chatbot
-│   │   ├── indiaContacts.js       # State-wise contact entries for India map
-│   │   └── indiaMapPaths.js       # SVG path data for India map
-│   ├── pages/
-│   │   ├── _app.js                # LanguageProvider, FirstTimeLanguageModal, Mascot, Chatbot, FloatingSocialMedia
-│   │   ├── _document.js
-│   │   ├── _error.js, 404.js
-│   │   ├── index.js               # Home
-│   │   ├── about/, careers/, clients/, contact/
-│   │   ├── foreign-collaborations/, investor-relations/, our-team/
-│   │   ├── privacy/, terms/
-│   │   ├── products/index.jsx     # Product catalog
-│   │   ├── products/[productId].jsx
-│   │   └── api/
-│   │       ├── contact/submit.js  # → Google Sheets
-│   │       ├── careers/submit.js  # multipart + PDF → Nodemailer
-│   │       └── chat/gemini.js     # → Google Gemini
-│   ├── public/
-│   │   ├── assets/                # brand-logos, employeephotos, product-*, gallery-*, hero, mascot, logos, team-member-*
-│   │   ├── fonts/Montserrat[wght].ttf
-│   │   ├── favicon.ico, robots.txt, sitemap.xml
-│   ├── styles/globals.css
-│   ├── next.config.mjs
-│   ├── tailwind.config.js
-│   ├── postcss.config.mjs
-│   ├── jsconfig.json              # Path alias: @/* → ./*
-│   └── package.json
-├── .gitignore
-└── README.md
+├── site/                          # Next.js application root
+│   ├── components/                # Reusable React components
+│   │   ├── Navbar.jsx            # Main navigation bar
+│   │   ├── Footer.jsx            # Site footer with links
+│   │   ├── Hero.jsx              # Homepage hero section
+│   │   ├── USPSection.jsx        # Unique selling points
+│   │   ├── ProductsSection.jsx   # Product showcase
+│   │   ├── BrandsSection.jsx     # Client/partner logos
+│   │   ├── EmployeesSection.jsx  # Employee testimonials
+│   │   ├── TestimonialsSection.jsx # Client testimonials
+│   │   ├── DirectorSection.jsx   # Director's message
+│   │   ├── IndiaPresenceMap.jsx  # Interactive India map (Contact page)
+│   │   ├── LanguageSelector.jsx  # Language switcher
+│   │   ├── FirstTimeLanguageModal.jsx # Initial language selection
+│   │   ├── Chatbot.jsx           # AI chatbot (Google Gemini)
+│   │   ├── Mascot.jsx            # Floating mascot with facts
+│   │   └── FloatingSocialMedia.jsx # Social media links
+│   ├── contexts/                  # React context providers
+│   │   └── LanguageContext.jsx   # Multilingual support (12 languages)
+│   ├── lib/                       # Data and utility files
+│   │   ├── translations.js        # UI translations for all languages
+│   │   ├── directorData.js        # Director information
+│   │   ├── employeesData.js       # Employee testimonials and photos
+│   │   ├── productsData.js        # Product catalog data
+│   │   ├── chatbotData.js         # Chatbot FAQs and product info
+│   │   ├── indiaContacts.js       # State-wise contact information
+│   │   └── indiaMapPaths.js       # SVG paths for India map
+│   ├── pages/                     # Next.js pages and API routes
+│   │   ├── _app.js               # App wrapper (providers, global components)
+│   │   ├── _document.js          # Custom HTML document
+│   │   ├── _error.js              # Error page
+│   │   ├── 404.js                # 404 page
+│   │   ├── index.js              # Homepage
+│   │   ├── about/                # About page
+│   │   ├── careers/              # Careers page with application form
+│   │   ├── clients/              # Clients/partners showcase
+│   │   ├── contact/              # Contact form and India map
+│   │   ├── foreign-collaborations/ # International partnerships
+│   │   ├── investor-relations/   # Investor information
+│   │   ├── our-team/             # Team page
+│   │   ├── privacy/              # Privacy policy
+│   │   ├── terms/                # Terms of service
+│   │   ├── products/            # Product pages
+│   │   │   ├── index.jsx        # Product catalog
+│   │   │   └── [productId].jsx  # Individual product pages
+│   │   └── api/                  # API routes
+│   │       ├── contact/submit.js # Contact form → Google Sheets
+│   │       ├── careers/submit.js # Career applications → Email
+│   │       └── chat/gemini.js    # Chatbot → Google Gemini API
+│   ├── public/                    # Static assets (served at root)
+│   │   ├── assets/               # Images and media
+│   │   │   ├── brand-logos/     # Client/partner logos
+│   │   │   ├── employeephotos/  # Employee photos
+│   │   │   ├── product-*.png    # Product images
+│   │   │   ├── gallery-*.jpg    # Gallery images
+│   │   │   ├── hero-image.png   # Hero section image
+│   │   │   ├── mascot.png       # Mascot image
+│   │   │   ├── logo-navbar.jpg  # Navbar logo
+│   │   │   ├── logo-footer.jpg  # Footer logo
+│   │   │   └── team-member-*.png # Fallback team member images
+│   │   ├── certificates/        # Certificate PDFs (see README.md)
+│   │   ├── fonts/               # Custom fonts
+│   │   │   └── Montserrat[wght].ttf
+│   │   ├── directorphoto.png    # Director photo
+│   │   ├── directorphoto2.png   # Director photo (alternative)
+│   │   ├── omemployeesay.png    # Employee photo
+│   │   ├── favicon.ico          # Site favicon
+│   │   ├── robots.txt           # SEO robots file
+│   │   └── sitemap.xml          # SEO sitemap
+│   ├── styles/                   # Global styles
+│   │   └── globals.css          # Global CSS with Tailwind and custom styles
+│   ├── next.config.mjs          # Next.js configuration
+│   ├── tailwind.config.js       # Tailwind CSS configuration
+│   ├── postcss.config.mjs       # PostCSS configuration
+│   ├── jsconfig.json            # JavaScript path aliases (@/* → ./)
+│   ├── package.json             # Dependencies and scripts
+│   └── .gitignore              # Git ignore rules
+├── .gitignore                   # Root git ignore
+└── README.md                    # This file
 ```
 
 ---
@@ -223,13 +279,26 @@ Product catalog is also defined in `pages/products/index.jsx` (categories and pr
 
 ## Assets (`site/public/`)
 
-- **`assets/brand-logos/`** — Client/partner logos (Home, Clients).  
-- **`assets/employeephotos/`** — Employee photos.  
-- **`assets/`** — `product-*.png`, `gallery-*.jpg`, `hero-image.png`, `mascot.png`, `logo-navbar.jpg`, `logo-footer.jpg`, `team-member-01.png`–`team-member-10.png` (fallbacks).  
-- **`fonts/Montserrat[wght].ttf`** — Primary font.  
-- **`favicon.ico`**, **`robots.txt`**, **`sitemap.xml`**.  
+### Image Assets
+- **`assets/brand-logos/`** — Client/partner logos used in BrandsSection and Clients page
+- **`assets/employeephotos/`** — Employee photos referenced in `employeesData.js`
+- **`assets/product-*.png`** — Product images for the product catalog
+- **`assets/gallery-*.jpg`** — Gallery images (manufacturing facility, production line, quality control, warehouse)
+- **`assets/hero-image.png`** — Hero section background image
+- **`assets/mascot.png`** — Mascot image for floating mascot component
+- **`assets/logo-navbar.jpg`** — Logo used in navigation bar
+- **`assets/logo-footer.jpg`** — Logo used in footer
+- **`assets/team-member-01.png` to `team-member-10.png`** — Fallback images for testimonials
 
-`next.config.mjs` uses `images.unoptimized: true`; no Image Optimization API is required.
+### Other Assets
+- **`directorphoto.png`** — Director photo (used in DirectorSection)
+- **`directorphoto2.png`** — Alternative director photo
+- **`omemployeesay.png`** — Employee photo (Om Gupta)
+- **`fonts/Montserrat[wght].ttf`** — Primary brand font (variable weight)
+- **`certificates/`** — Directory for PDF certificates (see `certificates/README.md`)
+- **`favicon.ico`**, **`robots.txt`**, **`sitemap.xml`** — SEO files
+
+**Note:** `next.config.mjs` uses `images.unoptimized: true`; no Image Optimization API is required.
 
 ---
 

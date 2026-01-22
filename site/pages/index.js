@@ -92,7 +92,7 @@ const fallbackProductData = [
     title: "School & Educational Furniture",
     shortTitle: "School Furniture",
     tagline: "Learning Spaces",
-    image: "/assets/pexels-entero-30544238.jpg",
+    image: "/assets/gallery-manufacturing-facility.jpg",
     description: "Quality Educational Furniture",
     subcategories: [
       {
@@ -134,7 +134,7 @@ const fallbackServicesData = [
     subtitle: "State-of-the-art production facility",
     description: "Our advanced manufacturing facility produces a comprehensive range of industrial, decorative, and specialty paints. We use cutting-edge technology and premium raw materials to ensure consistent quality and performance.",
     bullets: ["Automated batch processing", "Quality control at every stage", "Custom color matching services"],
-    image: "/assets/pexels-entero-30544238.jpg",
+    image: "/assets/gallery-manufacturing-facility.jpg",
   },
   {
     id: 2,
@@ -152,7 +152,7 @@ const fallbackServicesData = [
     subtitle: "Complete educational furniture provider",
     description: "End-to-end school furniture solutions from design consultation to bulk manufacturing. We specialize in ergonomic, durable furniture that creates better learning environments for students and teachers.",
     bullets: ["Custom design consultation", "Bulk order manufacturing", "Installation & after-sales support"],
-    image: "/assets/pexels-dilara-uygunadimdoga-67885961-8301940.jpg",
+    image: "/assets/gallery-production-line.jpg",
   },
   {
     id: 4,

@@ -288,7 +288,7 @@ export default function ContactPage() {
               <div className="company-card">
                 <div className="company-logo">
                   <Image 
-                    src="/assets/logo2.jpg" 
+                    src="/assets/logo-footer.jpg" 
                     alt="YNM Mega Industries" 
                     width={70} 
                     height={70} 
