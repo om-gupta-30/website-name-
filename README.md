@@ -203,7 +203,9 @@ YNM website/
 
 ## Environment Variables
 
-Create **`site/.env.local`** and set the variables used by the features you enable.
+**⚠️ SECURITY WARNING:** Never commit `.env.local` or any `.env` files to Git. They contain sensitive API keys and credentials. The `.gitignore` file is configured to exclude these files.
+
+Create **`site/.env.local`** and set the variables used by the features you enable. You can use **`site/.env.example`** as a template (it contains placeholder values, no real secrets).
 
 ### Contact form (Google Sheets)
 
