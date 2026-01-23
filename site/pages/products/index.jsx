@@ -15,8 +15,8 @@ const productsData = {
     icon: "🏭",
     categories: {
       paints: {
-        title: "Premium Paints",
-        description: "High-quality industrial and decorative paints for every surface",
+        title: "Paints",
+        description: "High-quality industrial and decorative paints for every surface. Durable, vibrant, and eco-friendly formulations for long-lasting protection.",
         icon: "🎨",
         products: [
           {
@@ -49,9 +49,93 @@ const productsData = {
           }
         ]
       },
+      "road-safety-furniture": {
+        title: "Road Safety Furniture",
+        description: "Essential road safety equipment including guardrails, bollards, and traffic barriers designed for maximum durability and safety compliance.",
+        icon: "🛣️",
+        products: [
+          {
+            id: "rsf1",
+            name: "Traffic Bollards",
+            desc: "High-visibility traffic bollards for pedestrian safety and traffic management.",
+            image: "/assets/product-industrial-racking.png",
+            specs: ["Reflective strips", "Steel construction", "Weather resistant", "Easy installation"]
+          },
+          {
+            id: "rsf2",
+            name: "Guardrail Posts",
+            desc: "Durable guardrail posts for road safety barriers and median dividers.",
+            image: "/assets/product-structural-steel.png",
+            specs: ["Galvanized steel", "IS certified", "Corrosion resistant", "Long service life"]
+          },
+          {
+            id: "rsf3",
+            name: "Road Delineators",
+            desc: "Flexible road delineators for lane marking and traffic guidance.",
+            image: "/assets/product-custom-metal-enclosure.png",
+            specs: ["Flexible design", "High visibility", "Impact resistant", "Easy maintenance"]
+          }
+        ]
+      },
+      "crash-barriers": {
+        title: "Metal Beam Crash Barriers",
+        description: "High-strength metal beam crash barriers and W-beam guardrails for highways and expressways. Engineered for maximum impact resistance.",
+        icon: "🛡️",
+        products: [
+          {
+            id: "cb1",
+            name: "W-Beam Crash Barrier",
+            desc: "Standard W-beam crash barriers for highways and expressways. Maximum impact resistance.",
+            image: "/assets/product-structural-steel.png",
+            specs: ["W-beam profile", "Galvanized finish", "IS 14687 certified", "High tensile strength"]
+          },
+          {
+            id: "cb2",
+            name: "Thrie-Beam Guardrail",
+            desc: "Heavy-duty thrie-beam guardrails for high-speed highways and bridges.",
+            image: "/assets/product-structural-steel.png",
+            specs: ["Thrie-beam profile", "Extra strength", "Bridge applications", "Long span capability"]
+          },
+          {
+            id: "cb3",
+            name: "Terminal End Treatment",
+            desc: "Safety terminal end treatments for crash barrier systems.",
+            image: "/assets/product-custom-metal-enclosure.png",
+            specs: ["Energy absorbing", "Safe termination", "Easy installation", "IS certified"]
+          }
+        ]
+      },
+      signages: {
+        title: "Signages",
+        description: "Retro-reflective sign boards and traffic signages for roads and highways. High visibility and weather-resistant for optimal safety.",
+        icon: "🚦",
+        products: [
+          {
+            id: "sg1",
+            name: "Retro-Reflective Sign Boards",
+            desc: "High-visibility retro-reflective sign boards for highways and urban roads.",
+            image: "/assets/product-exterior-weather-coat.png",
+            specs: ["Retro-reflective film", "Aluminum substrate", "Weather resistant", "Long visibility range"]
+          },
+          {
+            id: "sg2",
+            name: "Traffic Signages",
+            desc: "Standard traffic signages for regulatory, warning, and informational purposes.",
+            image: "/assets/product-exterior-weather-coat.png",
+            specs: ["IRR 2000 compliant", "Multiple sizes", "Durable materials", "Easy installation"]
+          },
+          {
+            id: "sg3",
+            name: "Directional Sign Boards",
+            desc: "Large format directional and destination sign boards for highways.",
+            image: "/assets/product-exterior-weather-coat.png",
+            specs: ["High visibility", "Custom sizes", "Weatherproof", "Long service life"]
+          }
+        ]
+      },
       fabrication: {
-        title: "Metal Fabrication",
-        description: "Custom steel and metal fabrication solutions for all industries",
+        title: "Fabrication",
+        description: "Custom steel and metal fabrication solutions. From structural components to precision-engineered parts for all industrial needs.",
         icon: "⚙️",
         products: [
           {
@@ -79,7 +163,7 @@ const productsData = {
       },
       furniture: {
         title: "School Furniture",
-        description: "Ergonomic and durable furniture for educational institutions",
+        description: "Ergonomic and durable furniture for educational institutions. Desks, chairs, and complete classroom solutions built to last.",
         icon: "🪑",
         products: [
           {
@@ -102,27 +186,6 @@ const productsData = {
             desc: "Modular library shelving systems for schools and colleges.",
             image: "/assets/product-library-shelving.png",
             specs: ["Heavy-duty steel", "Adjustable shelves", "Book dividers", "Label holders"]
-          }
-        ]
-      },
-      safety: {
-        title: "Safety Equipment",
-        description: "Premium safety gear and equipment for industrial use",
-        icon: "🛡️",
-        products: [
-          {
-            id: "se1",
-            name: "Safety Helmets",
-            desc: "Industrial-grade safety helmets with impact resistance.",
-            image: "/assets/product-industrial-paint.png",
-            specs: ["IS certified", "UV resistant", "Adjustable fit", "Ventilation system"]
-          },
-          {
-            id: "se2",
-            name: "Protective Gloves",
-            desc: "Heavy-duty protective gloves for various industrial applications.",
-            image: "/assets/product-exterior-weather-coat.png",
-            specs: ["Cut resistant", "Chemical protection", "Multiple sizes", "Durable material"]
           }
         ]
       }

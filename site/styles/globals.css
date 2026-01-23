@@ -1859,7 +1859,41 @@ section {
 }
 
 /* ========================================
-   NEW PRODUCTS GRID - CATEGORY SECTIONS
+   NEW PRODUCTS GRID - 6 CARDS LAYOUT
+   ======================================== */
+
+/* Products Grid Container */
+.ps-products-grid-container {
+  padding: 0 40px 60px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Products Grid - 3 columns */
+.ps-products-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+@media (max-width: 1024px) {
+  .ps-products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .ps-products-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .ps-products-grid-container {
+    padding: 0 20px 40px;
+  }
+}
+
+/* ========================================
+   OLD PRODUCTS GRID - CATEGORY SECTIONS (KEPT FOR BACKWARD COMPATIBILITY)
    ======================================== */
 
 /* Categories Row - Side by Side Layout */
