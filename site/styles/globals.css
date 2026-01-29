@@ -267,11 +267,97 @@ html {
   scroll-behavior: auto; /* Using fast JS scroll instead */
   scroll-padding-top: 110px; /* clear fixed navbar (100px) on anchor jump */
   overflow-x: hidden; /* prevent horizontal page scroll (reinforce) */
+  /* Smooth font rendering on all platforms */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 html, body {
   overscroll-behavior-y: auto; /* allow normal trackpad/wheel scroll on Windows */
   overscroll-behavior-x: none;
+}
+
+/* ========================================
+   CROSS-PLATFORM OPTIMIZATIONS
+   Mac, Windows, Linux compatibility
+   ======================================== */
+
+/* Windows-specific optimizations */
+.platform-windows {
+  /* Smooth scrolling for Windows trackpads and mice */
+  scroll-behavior: auto;
+}
+
+.platform-windows body {
+  /* Improve font rendering on Windows */
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "kern" 1;
+}
+
+.platform-windows * {
+  /* Better scroll performance on Windows */
+  scroll-behavior: auto;
+}
+
+/* Fix for Windows high-DPI displays */
+@media (-webkit-min-device-pixel-ratio: 1.25), (min-resolution: 120dpi) {
+  body {
+    -webkit-font-smoothing: subpixel-antialiased;
+  }
+}
+
+/* Mac-specific optimizations */
+.platform-mac {
+  /* Native-like smooth scrolling on Mac */
+  -webkit-overflow-scrolling: touch;
+}
+
+.platform-mac body {
+  /* Better font rendering on Mac Retina */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure consistent appearance across platforms */
+input, textarea, button, select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  font-family: inherit;
+}
+
+/* Prevent layout shift from scrollbar */
+html {
+  scrollbar-gutter: stable;
+}
+
+/* Custom scrollbar for consistency across platforms */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(116, 6, 13, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(201, 162, 77, 0.6);
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(201, 162, 77, 0.9);
+  background-clip: content-box;
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201, 162, 77, 0.6) rgba(116, 6, 13, 0.1);
 }
 
 /* Scroll Performance Optimizations */
@@ -7165,6 +7251,8 @@ img {
   overflow: hidden;
   padding: 40px 0;
   z-index: 1;
+  /* Performance: Contain layout changes */
+  contain: layout;
 }
 
 /* Marquee Content - The animated track */
@@ -7173,6 +7261,10 @@ img {
   gap: 30px;
   width: max-content;
   animation: marquee-scroll 40s linear infinite;
+  /* Performance: GPU acceleration for smooth infinite scroll */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 /* Pause on hover */
@@ -7183,13 +7275,16 @@ img {
 /* Individual card wrapper with rotation */
 .testimonial-card-wrapper {
   flex-shrink: 0;
-  transform: rotate(var(--card-rotation, 0deg));
+  transform: rotate(var(--card-rotation, 0deg)) translateZ(0);
   transition: transform 0.3s ease;
+  /* Performance: Promote to own layer */
+  isolation: isolate;
 }
 
 .testimonial-card-wrapper:hover {
-  transform: rotate(0deg) scale(1.05) translateY(-10px);
+  transform: rotate(0deg) scale(1.05) translateY(-10px) translateZ(0);
   z-index: 10;
+  will-change: transform;
 }
 
 /* Testimonial Card */
@@ -8900,6 +8995,9 @@ img {
   overflow: hidden;
   pointer-events: none;
   z-index: 1;
+  /* Performance: Only render when visible */
+  content-visibility: auto;
+  contain-intrinsic-size: 100% 100%;
 }
 
 /* Base particle styles */
@@ -8907,11 +9005,18 @@ img {
   position: absolute;
   border-radius: 50%;
   animation: neonFloat 12s ease-in-out infinite;
-  will-change: transform, opacity;
+  /* Performance: Use transform instead of will-change for persistent animations */
   transform: translateZ(0);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   contain: layout style paint;
+  /* GPU layer promotion without constant will-change */
+  isolation: isolate;
+}
+
+/* Only apply will-change on hover for better performance */
+.neon-particle:hover {
+  will-change: transform, opacity;
 }
 
 /* Different particle sizes */
@@ -11090,4 +11195,175 @@ img {
     padding: 6px 10px;
     font-size: 11px;
   }
+}
+
+/* ========================================
+   FINAL CROSS-PLATFORM NORMALIZATIONS
+   Ensures consistent UI on Mac, Windows, Linux
+   ======================================== */
+
+/* Fix for 100vh on mobile browsers (iOS Safari, etc.) */
+@supports (height: 100dvh) {
+  #hero {
+    height: 100dvh;
+    min-height: 100dvh;
+  }
+}
+
+/* Safe area insets for notched devices */
+@supports (padding: env(safe-area-inset-top)) {
+  #navbar {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .floating-social-container {
+    right: max(20px, env(safe-area-inset-right));
+  }
+  
+  .mascot-container {
+    left: max(20px, env(safe-area-inset-left));
+  }
+}
+
+/* Ensure smooth animations on all platforms */
+@media screen {
+  /* Use hardware acceleration selectively */
+  .hero-text-float,
+  .brand-tile-inner,
+  .marquee-content,
+  .neon-particle,
+  .hero-particle {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+}
+
+/* High refresh rate monitor optimization (120Hz+) */
+@media (prefers-reduced-motion: no-preference) {
+  .hero-text-float {
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .brand-tile-inner {
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* Windows high contrast mode support */
+@media (forced-colors: active) {
+  .hero-btn,
+  .nav-link,
+  .brand-tile {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Print media - hide non-essential elements */
+@media print {
+  .hero-neon-particles,
+  .neon-particles,
+  .mascot-container,
+  .floating-social-container,
+  .chatbot-toggle,
+  .chatbot-window,
+  #scroll-mouse,
+  #hero-hud-ring,
+  #glass-sweep {
+    display: none !important;
+  }
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .marquee-content {
+    animation: none !important;
+  }
+  
+  .hero-text-float {
+    animation: none !important;
+  }
+}
+
+/* Fix for Firefox smooth scrolling */
+@-moz-document url-prefix() {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Fix for Safari backdrop-filter performance */
+@supports (backdrop-filter: blur(8px)) {
+  #navbar {
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+}
+
+/* Ensure text remains sharp on all displays */
+* {
+  text-rendering: optimizeLegibility;
+}
+
+/* Prevent text selection on UI elements */
+.nav-link,
+.hero-btn,
+.brand-tile,
+.stat-number,
+.stat-label {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Allow text selection on content areas */
+p, h1, h2, h3, h4, h5, h6, span, article, section {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+/* Fix for Windows ClearType rendering */
+.platform-windows body {
+  font-feature-settings: "liga" 1, "kern" 1;
+}
+
+/* Fix for Mac subpixel rendering */
+.platform-mac body {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Ensure consistent box-sizing across all browsers */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Improve touch target sizes for mobile */
+@media (pointer: coarse) {
+  .nav-link,
+  .hero-btn,
+  .brand-tile,
+  .floating-social-link {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Optimize images for different pixel densities */
+img {
+  max-width: 100%;
+  height: auto;
+  image-rendering: -webkit-optimize-contrast;
 }

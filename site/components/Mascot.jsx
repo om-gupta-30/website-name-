@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 
 // Company facts and prompts the mascot will share
@@ -17,7 +17,9 @@ export default function Mascot() {
   const [currentPrompt, setCurrentPrompt] = useState("");
   const [showBubble, setShowBubble] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
-  const [scrollY, setScrollY] = useState(0);
+  const scrollYRef = useRef(0);
+  const rafIdRef = useRef(null);
+  const containerRef = useRef(null);
 
   // Get random prompt
   const getRandomPrompt = useCallback(() => {
@@ -25,14 +27,32 @@ export default function Mascot() {
     return mascotPrompts[randomIndex];
   }, []);
 
-  // Track scroll position for mascot animation
+  // Optimized scroll tracking using RAF - updates transform directly without state
   useEffect(() => {
+    let ticking = false;
+    
+    const updatePosition = () => {
+      if (containerRef.current) {
+        const bounceOffset = Math.sin(scrollYRef.current * 0.01) * 3;
+        containerRef.current.style.transform = `translateY(${bounceOffset}px)`;
+      }
+      ticking = false;
+    };
+
     const handleScroll = () => {
-      setScrollY(window.scrollY);
+      scrollYRef.current = window.scrollY;
+      
+      if (!ticking) {
+        rafIdRef.current = requestAnimationFrame(updatePosition);
+        ticking = true;
+      }
     };
     
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
+    };
   }, []);
 
   // Show mascot after page loads with pop-in animation
@@ -88,15 +108,11 @@ export default function Mascot() {
     setIsMinimized(true);
   };
 
-  // Calculate a subtle bounce based on scroll (optional, can remove if animation handles it)
-  const bounceOffset = Math.sin(scrollY * 0.01) * 3;
-  const transformStyle = `translateY(${bounceOffset}px)`;
-
   // Always render container so animation can work
   return (
     <div 
+      ref={containerRef}
       className={`mascot-container ${isVisible ? "visible" : ""} ${isMinimized ? "minimized" : ""}`}
-      style={{ transform: transformStyle }}
     >
       {/* Mascot Character */}
       <div className="mascot-character" onClick={handleMascotClick}>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 // Phone number for call feature
 const phoneNumber = "+919676575770";
@@ -93,17 +93,37 @@ const socialLinks = [
 export default function FloatingSocialMedia() {
   const [isVisible, setIsVisible] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [scrollY, setScrollY] = useState(0);
   const [showWhatsAppPopup, setShowWhatsAppPopup] = useState(false);
+  const scrollYRef = useRef(0);
+  const rafIdRef = useRef(null);
+  const containerRef = useRef(null);
 
-  // Track scroll position for floating animation
+  // Optimized scroll tracking using RAF - updates transform directly without state
   useEffect(() => {
+    let ticking = false;
+    
+    const updatePosition = () => {
+      if (containerRef.current) {
+        const bounceOffset = Math.sin(scrollYRef.current * 0.01) * 5;
+        containerRef.current.style.transform = `translateY(${bounceOffset}px)`;
+      }
+      ticking = false;
+    };
+
     const handleScroll = () => {
-      setScrollY(window.scrollY);
+      scrollYRef.current = window.scrollY;
+      
+      if (!ticking) {
+        rafIdRef.current = requestAnimationFrame(updatePosition);
+        ticking = true;
+      }
     };
     
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
+    };
   }, []);
 
   // Show social icons after page loads
@@ -135,9 +155,6 @@ export default function FloatingSocialMedia() {
 
   if (!isVisible) return null;
 
-  // Calculate a subtle bounce based on scroll
-  const bounceOffset = Math.sin(scrollY * 0.01) * 5;
-
   return (
     <>
       {/* WhatsApp Coming Soon Popup */}
@@ -151,8 +168,8 @@ export default function FloatingSocialMedia() {
       )}
 
       <div 
+        ref={containerRef}
         className={`floating-social-container ${isExpanded ? 'expanded' : ''}`}
-        style={{ transform: `translateY(${bounceOffset}px)` }}
       >
         {/* Toggle Button */}
         <button

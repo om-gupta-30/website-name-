@@ -124,6 +124,7 @@ export default function Hero({ heroData: propHeroData, navLinks: propNavLinks })
   };
 
   // 3D Tilt parallax - dramatic "page moving" effect on hover
+  // Optimized to only run RAF when needed (hovering)
   useEffect(() => {
     if (typeof window === "undefined") return;
     const hero = heroRef.current;
@@ -141,8 +142,20 @@ export default function Hero({ heroData: propHeroData, navLinks: propNavLinks })
     let target_ = { rotX: 0, rotY: 0, tx: 0, ty: 0 };
     let rafId = null;
     let isHovering = false;
+    let isAnimating = false;
 
     const lerp = (start, end, factor) => start + (end - start) * factor;
+
+    // Check if values are close enough to stop animating
+    const isSettled = () => {
+      const threshold = 0.01;
+      return (
+        Math.abs(current.rotX - target_.rotX) < threshold &&
+        Math.abs(current.rotY - target_.rotY) < threshold &&
+        Math.abs(current.tx - target_.tx) < threshold &&
+        Math.abs(current.ty - target_.ty) < threshold
+      );
+    };
 
     const animate = () => {
       // Faster lerp when hovering, slower when returning to center
@@ -162,7 +175,23 @@ export default function Hero({ heroData: propHeroData, navLinks: propNavLinks })
         scale(1.02)
       `;
 
-      rafId = requestAnimationFrame(animate);
+      // Only continue animating if not settled
+      if (!isSettled()) {
+        rafId = requestAnimationFrame(animate);
+      } else {
+        isAnimating = false;
+        // Reset transform when fully settled at origin
+        if (!isHovering) {
+          target.style.transform = 'perspective(1200px) scale(1.02)';
+        }
+      }
+    };
+
+    const startAnimation = () => {
+      if (!isAnimating) {
+        isAnimating = true;
+        rafId = requestAnimationFrame(animate);
+      }
     };
 
     const onMove = (e) => {
@@ -182,6 +211,8 @@ export default function Hero({ heroData: propHeroData, navLinks: propNavLinks })
       const maxTranslate = 25;
       target_.tx = x * maxTranslate;
       target_.ty = y * maxTranslate;
+
+      startAnimation();
     };
 
     const onLeave = () => {
@@ -190,10 +221,10 @@ export default function Hero({ heroData: propHeroData, navLinks: propNavLinks })
       target_.rotY = 0;
       target_.tx = 0;
       target_.ty = 0;
+      startAnimation();
     };
 
-    // Start animation loop
-    rafId = requestAnimationFrame(animate);
+    // Use passive event listeners for better scroll performance
     hero.addEventListener("mousemove", onMove, { passive: true });
     hero.addEventListener("mouseleave", onLeave, { passive: true });
 

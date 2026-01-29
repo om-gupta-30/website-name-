@@ -1494,36 +1494,15 @@ export default function ProductDetailPage() {
                 <div className="certificate-card">
                   <div className="certificate-icon">
                     <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                      <path d="M2 17l10 5 10-5M2 12l10 5 10-5" />
-                    </svg>
-                  </div>
-                  <h4>IS 5986</h4>
-                  <p>Indian Standard for Hot Rolled Steel Sheet Piling Sections</p>
-                  <button
-                    className="certificate-view-btn"
-                    onClick={() => window.open('/certificates/is-5986.pdf', '_blank')}
-                  >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                      <polyline points="15 3 21 3 21 9" />
-                      <line x1="10" y1="14" x2="21" y2="3" />
-                    </svg>
-                    View Certificate
-                  </button>
-                </div>
-                <div className="certificate-card">
-                  <div className="certificate-icon">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
                       <polyline points="22 4 12 14.01 9 11.01" />
                     </svg>
                   </div>
-                  <h4>MoRTH Specifications</h4>
-                  <p>Ministry of Road Transport & Highways Standards</p>
+                  <h4>MoRTH 803</h4>
+                  <p>Ministry of Road Transport & Highways Section 803 Specifications</p>
                   <button
                     className="certificate-view-btn"
-                    onClick={() => window.open('/certificates/morth-specs.pdf', '_blank')}
+                    onClick={() => window.open('/certificates/morth-803.pdf', '_blank')}
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
@@ -1557,16 +1536,37 @@ export default function ProductDetailPage() {
                 <div className="certificate-card">
                   <div className="certificate-icon">
                     <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                      <path d="M2 17l10 5 10-5M2 12l10 5 10-5" />
+                    </svg>
+                  </div>
+                  <h4>EN 1317</h4>
+                  <p>European Standard for Road Restraint Systems</p>
+                  <button
+                    className="certificate-view-btn"
+                    onClick={() => window.open('/certificates/en-1317.pdf', '_blank')}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                      <polyline points="15 3 21 3 21 9" />
+                      <line x1="10" y1="14" x2="21" y2="3" />
+                    </svg>
+                    View Certificate
+                  </button>
+                </div>
+                <div className="certificate-card">
+                  <div className="certificate-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
                       <line x1="3" y1="9" x2="21" y2="9" />
                       <line x1="9" y1="21" x2="9" y2="9" />
                     </svg>
                   </div>
-                  <h4>AASHTO M180</h4>
-                  <p>American Standard for Corrugated Steel Beam Guardrail</p>
+                  <h4>IRC 119</h4>
+                  <p>Indian Roads Congress Guidelines for Traffic Safety Barriers</p>
                   <button
                     className="certificate-view-btn"
-                    onClick={() => window.open('/certificates/aashto-m180.pdf', '_blank')}
+                    onClick={() => window.open('/certificates/irc-119.pdf', '_blank')}
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />

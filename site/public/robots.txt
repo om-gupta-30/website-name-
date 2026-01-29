@@ -2,6 +2,6 @@
 User-agent: *
 Allow: /
 
-# Update this if you deploy under a different domain
-Sitemap: https://ynmmegaindustries.com/sitemap.xml
+# Sitemap location (update with your actual domain)
+Sitemap: https://example.com/sitemap.xml
 

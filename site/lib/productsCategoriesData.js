@@ -60,12 +60,12 @@ export const productsData = {
             overviewPoints: [
               { label: "Product Type", value: "W Beam Crash Barrier" },
               { label: "Material", value: "High-grade galvanized steel" },
-              { label: "Beam Thickness", value: "2.7 mm / 3.0 mm (customizable)" },
+              { label: "Beam Thickness", value: "3mm" },
               { label: "Surface Finish", value: "Hot-dip galvanized (as per IS standards)" },
               { label: "Length", value: "3.0 m / 4.0 m (standard)" },
               { label: "Post Type", value: "C-post / Sigma post" },
-              { label: "Impact Performance", value: "High energy absorption" },
-              { label: "Compliance", value: "MoRTH, IRC, IS standards" }
+              { label: "Net Weight", value: "25 KG / RM" },
+              { label: "Quality Standards", value: "MoRTH 803, ISO 9001:2015, EN 1317, IRC 119" }
             ],
             
             // Detailed Specifications for spec table
@@ -78,12 +78,12 @@ export const productsData = {
               },
               {
                 label: "Manufacturing Location",
-                value: "Hyderabad",
+                value: "Telangana, Delhi, MP, Kolkata and Gujarat",
                 icon: "location"
               },
               {
                 label: "Net Weight",
-                value: "~13.8 kg per running meter (for T 3.0 mm beam)",
+                value: "25 KG / RM",
                 icon: "weight"
               },
               {
@@ -93,7 +93,7 @@ export const productsData = {
               },
               {
                 label: "Quality Standards",
-                value: "IS 5986, MoRTH Specifications, ISO 9001:2015, AASHTO M180",
+                value: "MoRTH 803, ISO 9001:2015, EN 1317, IRC 119",
                 icon: "standard"
               },
               {
@@ -113,14 +113,14 @@ export const productsData = {
               technical: [
                 "Product Type: W Beam Crash Barrier",
                 "Material: High-grade galvanized steel",
-                "Beam Thickness: 2.7 mm / 3.0 mm (customizable)",
+                "Beam Thickness: 3mm",
                 "Surface Finish: Hot-dip galvanized (as per IS standards)",
                 "Standard Length: 3.0 m / 4.0 m",
                 "Post Type: C-post / Sigma post",
-                "Net Weight: ~13.8 kg per running meter (for T 3.0 mm beam)",
+                "Net Weight: 25 KG / RM",
                 "Impact Performance: High energy absorption",
-                "Compliance: MoRTH, IRC, IS standards",
-                "Quality Standards: IS 5986, MoRTH Specifications, ISO 9001:2015, AASHTO M180",
+                "Compliance: MoRTH 803, IRC 119, EN 1317",
+                "Quality Standards: MoRTH 803, ISO 9001:2015, EN 1317, IRC 119",
                 "HS Code: 73089090"
               ],
               keyFeatures: [
@@ -162,17 +162,17 @@ export const productsData = {
             technicalSpecs: {
               "Product Type": "W Beam Crash Barrier",
               "Material": "High-grade galvanized steel",
-              "Beam Thickness": "2.7 mm / 3.0 mm (customizable)",
+              "Beam Thickness": "3mm",
               "Surface Finish": "Hot-dip galvanized (as per IS standards)",
               "Length": "3.0 m / 4.0 m (standard)",
               "Post Type": "C-post / Sigma post",
               "Impact Performance": "High energy absorption",
-              "Compliance": "MoRTH, IRC, IS standards",
+              "Compliance": "MoRTH 803, IRC 119, EN 1317",
               "Country of Origin": "India",
-              "Manufacturing Location": "Hyderabad",
-              "Net Weight": "~13.8 kg per running meter (for T 3.0 mm beam)",
+              "Manufacturing Location": "Telangana, Delhi, MP, Kolkata and Gujarat",
+              "Net Weight": "25 KG / RM",
               "Packing Type": "Bundled with steel straps / As per export standard packing",
-              "Quality Standards": "IS 5986, MoRTH Specifications, ISO 9001:2015, AASHTO M180",
+              "Quality Standards": "MoRTH 803, ISO 9001:2015, EN 1317, IRC 119",
               "MOQ": "100 meters / 1 metric ton / Project-based",
               "HS Code": "73089090"
             },
@@ -294,6 +294,37 @@ export const productsData = {
               "/assets/ghat road w beam barrier ynm safety.png"
             ],
             
+            // Our Projects / Clients
+            projects: [
+              {
+                id: "proj1",
+                title: "BEKEM INFRA PROJECTS PVT. LTD - Hyderabad Highway Project",
+                client: "BEKEM INFRA PROJECTS PVT. LTD",
+                location: "Hyderabad",
+                description: "Supplied 20,000 meters of W-Beam Crash Barriers for highway safety infrastructure development project in Hyderabad. Our high-quality galvanized steel barriers provided excellent impact resistance and long-term durability for this critical road safety installation.",
+                quantity: "20,000 mts",
+                year: "2024"
+              },
+              {
+                id: "proj2",
+                title: "ANUSHA PROJECTS PRIVATE LIMITED - Hyderabad Expressway Project",
+                client: "ANUSHA PROJECTS PRIVATE LIMITED",
+                location: "Hyderabad",
+                description: "Delivered 15,360 meters of W-Beam Crash Barriers for expressway median and roadside protection in Hyderabad. The installation enhanced road safety standards and reduced accident severity on this busy expressway corridor.",
+                quantity: "15,360 mts",
+                year: "2024"
+              },
+              {
+                id: "proj3",
+                title: "VRIDDHI INFRATECH INDIA PRIVATE LIMITED - Hyderabad Infrastructure Project",
+                client: "VRIDDHI INFRATECH INDIA PRIVATE LIMITED",
+                location: "Hyderabad",
+                description: "Supplied 28,500 meters of W-Beam Crash Barriers for comprehensive highway safety infrastructure project in Hyderabad. Our metal beam crash barriers were installed across bridges, curves, and high-risk zones, ensuring maximum protection for road users.",
+                quantity: "28,500 mts",
+                year: "2024"
+              }
+            ],
+            
             meta: {
               title: "W Beam Crash Barrier Manufacturer in India | YNM Safety",
               description: "Leading W beam crash barrier manufacturer in India. YNM Safety offers durable metal beam crash barriers for highways & expressways.",
@@ -372,13 +403,13 @@ export const productsData = {
               ]
             },
             
-            performanceMetrics: "100 running meters/month",
+            performanceMetrics: "100,000 running meters/month",
             
             statistics: {
-              annualCapacity: "1,200 rm",
+              annualCapacity: "1,200,000 rm",
               exportCountries: "25+",
               qualityStandards: "ISO 9001:2015",
-              productionSpeed: "100 rm"
+              productionSpeed: "100,000 rm"
             },
             
             // Manufacturing Process
