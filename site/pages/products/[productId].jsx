@@ -5,13 +5,13 @@ import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { getProductById, getAllProducts } from "@/lib/productsData";
+import { getProductById, getAllProducts } from "@/lib/productsCategoriesData";
 import { getProductById as getLegacyProduct } from "./index";
 
 export default function ProductDetailPage() {
   const router = useRouter();
   const { productId } = router.query;
-  const [activeSpecTab, setActiveSpecTab] = useState("technical");
+  const [activeSpecTab, setActiveSpecTab] = useState("keyFeatures");
   const [hoveredApplication, setHoveredApplication] = useState(null);
   const [visibleSteps, setVisibleSteps] = useState(new Set());
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -37,13 +37,21 @@ export default function ProductDetailPage() {
   let product = null;
   if (router.isReady && productId) {
     product = getProductById(productId);
+    // If product found but missing detailedDescription, use overview or desc
+    if (product && !product.detailedDescription) {
+      product.detailedDescription = product.overview || product.desc;
+    }
+    // Ensure statistics object exists (don't overwrite if it already exists)
+    if (product && !product.statistics) {
+      product.statistics = {};
+    }
     if (!product) {
       const legacyProduct = getLegacyProduct(productId);
       if (legacyProduct) {
         // Convert legacy product to enhanced format
         product = {
           ...legacyProduct,
-          detailedDescription: legacyProduct.desc,
+          detailedDescription: legacyProduct.detailedDescription || legacyProduct.overview || legacyProduct.desc,
           heroImage: legacyProduct.image,
           specifications: {
             technical: legacyProduct.specs || [],
@@ -107,9 +115,9 @@ export default function ProductDetailPage() {
           },
           applicationAreas: [],
           projects: [],
-          marketGrowth: null,
+          marketGrowth: legacyProduct.marketGrowth || null,
           manufacturingProcess: [],
-          statistics: {}
+          statistics: legacyProduct.statistics || {}
         };
       }
     }
@@ -119,6 +127,12 @@ export default function ProductDetailPage() {
   const productImages = useMemo(() => {
     if (!product) return [];
     const images = [];
+    
+    // If product has a gallery array, use it (prioritize for crash barriers)
+    if (product.gallery && product.gallery.length > 0) {
+      // Use up to 6 images from the gallery for a richer carousel
+      return product.gallery.slice(0, 6);
+    }
     
     // Add hero image if available
     if (product.heroImage) {
@@ -175,76 +189,15 @@ export default function ProductDetailPage() {
     };
   }, [productImages]);
 
-  // Animated statistics counter
+  // Set animated stats directly from product data (no JS animation to avoid issues)
   useEffect(() => {
-    if (!product || !product.statistics || !statsRef.current) return;
-
-    const observerOptions = {
-      threshold: 0.3,
-      rootMargin: '0px'
-    };
-
-    const currentRef = statsRef.current;
+    if (!product || !product.statistics) return;
     
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          // Animate annual capacity
-          if (product.statistics.annualCapacity) {
-            const capacity = product.statistics.annualCapacity;
-            const numericValue = parseInt(capacity.replace(/[^\d]/g, ''));
-            if (numericValue) {
-              let current = 0;
-              const increment = numericValue / 50;
-              const timer = setInterval(() => {
-                current += increment;
-                if (current >= numericValue) {
-                  current = numericValue;
-                  clearInterval(timer);
-                }
-                setAnimatedStats(prev => ({
-                  ...prev,
-                  annualCapacity: Math.floor(current).toLocaleString() + capacity.replace(/[\d,]/g, '')
-                }));
-              }, 30);
-            }
-          }
-
-          // Animate export countries
-          if (product.statistics.exportCountries) {
-            const countries = product.statistics.exportCountries;
-            const numericValue = parseInt(countries.replace(/[^\d]/g, ''));
-            if (numericValue) {
-              let current = 0;
-              const increment = numericValue / 30;
-              const timer = setInterval(() => {
-                current += increment;
-                if (current >= numericValue) {
-                  current = numericValue;
-                  clearInterval(timer);
-                }
-                setAnimatedStats(prev => ({
-                  ...prev,
-                  exportCountries: Math.floor(current) + countries.replace(/[\d]/g, '')
-                }));
-              }, 40);
-            }
-          }
-
-          observer.unobserve(entry.target);
-        }
-      });
-    }, observerOptions);
-
-    if (currentRef) {
-      observer.observe(currentRef);
-    }
-
-    return () => {
-      if (currentRef) {
-        observer.unobserve(currentRef);
-      }
-    };
+    // Set the final values directly
+    setAnimatedStats({
+      annualCapacity: product.statistics.annualCapacity || '',
+      exportCountries: product.statistics.exportCountries || ''
+    });
   }, [product]);
 
   // Scroll animation for manufacturing steps - must be called before any returns
@@ -325,15 +278,29 @@ export default function ProductDetailPage() {
   }
 
   const allProducts = getAllProducts();
-  const relatedProducts = allProducts
-    .filter(p => p.id !== product.id && p.category === product.category)
-    .slice(0, 3);
+  
+  // For MBCB products (cb1, cb2, cb3, cb4, cb5), show other MBCB products
+  const mbcbProductIds = ['cb1', 'cb2', 'cb3', 'cb4', 'cb5'];
+  const isMBCBProduct = mbcbProductIds.includes(product.id);
+  
+  const relatedProducts = isMBCBProduct
+    ? allProducts.filter(p => mbcbProductIds.includes(p.id) && p.id !== product.id).slice(0, 4)
+    : allProducts.filter(p => p.id !== product.id && p.category === product.category).slice(0, 3);
+
+  // Use product meta data if available
+  const metaTitle = product.meta?.title || `${product.name} - YNM Mega Industries`;
+  const metaDescription = product.meta?.description || product.shortDesc || product.desc;
 
   return (
     <>
       <Head>
-        <title>{product.name} - YNM Mega Industries</title>
-        <meta name="description" content={product.shortDesc || product.desc} />
+        <title>{metaTitle}</title>
+        <meta name="description" content={metaDescription} />
+        <meta property="og:title" content={metaTitle} />
+        <meta property="og:description" content={metaDescription} />
+        {product.image && <meta property="og:image" content={product.image} />}
+        <meta property="og:type" content="product" />
+        {product.meta?.slug && <link rel="canonical" href={`https://ynmsafety.com${product.meta.slug}`} />}
       </Head>
 
       <Navbar />
@@ -422,22 +389,6 @@ export default function ProductDetailPage() {
             <div className="product-hero-content">
               <h1 className="product-hero-title">{product.name}</h1>
               <p className="product-hero-description">{product.shortDesc || product.desc}</p>
-              {product.statistics && (
-                <div className="product-hero-stats">
-                  {product.statistics.annualCapacity && (
-                    <div className="stat-item">
-                      <div className="stat-value">{product.statistics.annualCapacity}</div>
-                      <div className="stat-label">Annual Capacity</div>
-                    </div>
-                  )}
-                  {product.statistics.exportCountries && (
-                    <div className="stat-item">
-                      <div className="stat-value">{product.statistics.exportCountries}</div>
-                      <div className="stat-label">Export Countries</div>
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
           </div>
         </section>
@@ -461,8 +412,8 @@ export default function ProductDetailPage() {
                         </svg>
                       </div>
                       <div className="stat-card-content">
-                        <div className="stat-value" data-target={product.statistics.annualCapacity}>
-                          {animatedStats.annualCapacity || "0"}
+                        <div className="stat-value">
+                          {product.statistics.annualCapacity}
                         </div>
                         <div className="stat-label">Annual Production Capacity</div>
                       </div>
@@ -478,8 +429,8 @@ export default function ProductDetailPage() {
                         </svg>
                       </div>
                       <div className="stat-card-content">
-                        <div className="stat-value" data-target={product.statistics.exportCountries}>
-                          {animatedStats.exportCountries || "0"}
+                        <div className="stat-value">
+                          {product.statistics.exportCountries}
                         </div>
                         <div className="stat-label">Export Countries</div>
                       </div>
@@ -511,7 +462,7 @@ export default function ProductDetailPage() {
                       </div>
                       <div className="stat-card-content">
                         <div className="stat-value">{product.statistics.productionSpeed}</div>
-                        <div className="stat-label">Daily Production Rate</div>
+                        <div className="stat-label">Monthly Production</div>
                       </div>
                       <div className="stat-card-glow" />
                     </div>
@@ -523,12 +474,37 @@ export default function ProductDetailPage() {
         )}
 
         {/* Detailed Description Section */}
-        {product.detailedDescription && (
+        {(product.detailedDescription || product.overview) && (
           <section className="product-description-section">
             <div className="product-section-container">
-              <h2 className="product-section-title">Product Overview</h2>
               <div className="product-description-content">
-                <p>{product.detailedDescription}</p>
+                {/* Technical Specifications Table - First */}
+                {product.overviewPoints && product.overviewPoints.length > 0 && (
+                  <div className="overview-specs-table">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Parameter</th>
+                          <th>Specification</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {product.overviewPoints.map((point, index) => (
+                          <tr key={index}>
+                            <td>{point.label}</td>
+                            <td>{point.value}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                {/* Product Overview Heading - After Table */}
+                <h2 className="product-section-title" style={{ marginTop: '40px' }}>Product Overview</h2>
+
+                {/* Description Paragraph - After Heading */}
+                <p>{product.detailedDescription || product.overview}</p>
               </div>
             </div>
           </section>
@@ -611,104 +587,71 @@ export default function ProductDetailPage() {
         {product.pricing && (
           <section className="product-pricing-section">
             <div className="product-section-container">
-              <h2 className="product-section-title">Pricing & Availability</h2>
+              <h2 className="product-section-title">Pricing</h2>
               <p className="product-section-subtitle">
-                Competitive pricing in multiple currencies with flexible package options
+                {product.pricing.basePriceINR 
+                  ? `Price per running meter for ${product.pricing.thickness || 't=3mm'} thickness`
+                  : 'Competitive pricing in multiple currencies'}
               </p>
 
-              {/* Currency Selector */}
-              <div className="currency-selector-wrapper">
-                <div className="currency-selector">
-                  <label>Select Currency:</label>
-                  <div className="currency-buttons">
-                    {Object.keys(exchangeRates).map((currency) => (
-                      <button
-                        key={currency}
-                        className={`currency-btn ${selectedCurrency === currency ? 'active' : ''}`}
-                        onClick={() => setSelectedCurrency(currency)}
+              {/* Multi-Currency Pricing Grid - 7x2 layout */}
+              <div className="multi-currency-pricing-grid">
+                {(() => {
+                  // Base price in INR (₹1,900 per running meter)
+                  const basePriceINR = product.pricing.basePriceINR || 1900;
+                  
+                  // 14 currencies with flags (7 per row)
+                  const currencyData = [
+                    // Row 1
+                    { code: 'INR', symbol: '₹', rate: 1, name: 'India', flag: '🇮🇳' },
+                    { code: 'USD', symbol: '$', rate: 1/83.12, name: 'USA', flag: '🇺🇸' },
+                    { code: 'EUR', symbol: '€', rate: 1/90.50, name: 'Europe', flag: '🇪🇺' },
+                    { code: 'GBP', symbol: '£', rate: 1/105.20, name: 'UK', flag: '🇬🇧' },
+                    { code: 'AED', symbol: 'د.إ', rate: 1/22.64, name: 'UAE', flag: '🇦🇪' },
+                    { code: 'SAR', symbol: '﷼', rate: 1/22.16, name: 'Saudi Arabia', flag: '🇸🇦' },
+                    { code: 'AUD', symbol: 'A$', rate: 1/54.50, name: 'Australia', flag: '🇦🇺' },
+                    // Row 2
+                    { code: 'CAD', symbol: 'C$', rate: 1/61.20, name: 'Canada', flag: '🇨🇦' },
+                    { code: 'JPY', symbol: '¥', rate: 1/0.54, name: 'Japan', flag: '🇯🇵' },
+                    { code: 'CNY', symbol: '¥', rate: 1/11.45, name: 'China', flag: '🇨🇳' },
+                    { code: 'SGD', symbol: 'S$', rate: 1/61.80, name: 'Singapore', flag: '🇸🇬' },
+                    { code: 'ZAR', symbol: 'R', rate: 1/4.58, name: 'South Africa', flag: '🇿🇦' },
+                    { code: 'MYR', symbol: 'RM', rate: 1/18.70, name: 'Malaysia', flag: '🇲🇾' },
+                    { code: 'QAR', symbol: 'ر.ق', rate: 1/22.84, name: 'Qatar', flag: '🇶🇦' }
+                  ];
+
+                  return currencyData.map((currency, index) => {
+                    const convertedPrice = basePriceINR * currency.rate;
+                    
+                    return (
+                      <div 
+                        key={index} 
+                        className={`currency-price-card ${index === 0 ? 'highlighted' : ''}`}
                       >
-                        {currency}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                        <div className="currency-flag-icon">{currency.flag}</div>
+                        <div className="currency-code-badge">
+                          <span className="currency-code">{currency.code}</span>
+                        </div>
+                        <div className="currency-price">
+                          <span className="currency-symbol">{currency.symbol}</span>
+                          <span className="currency-amount">
+                            {currency.code === 'INR' 
+                              ? convertedPrice.toLocaleString('en-IN') 
+                              : currency.code === 'JPY'
+                                ? Math.round(convertedPrice).toLocaleString()
+                                : convertedPrice.toFixed(2)}
+                          </span>
+                        </div>
+                        <div className="currency-unit">per running meter</div>
+                        <div className="currency-name">{currency.name}</div>
+                      </div>
+                    );
+                  });
+                })()}
               </div>
 
-              {/* Package Sizes Grid */}
-              <div className="pricing-packages-grid">
-                {product.pricing.packageSizes.map((pkg, index) => {
-                  const basePrice = pkg.priceUSD * exchangeRates[selectedCurrency];
-                  const currencySymbol = {
-                    USD: '$',
-                    EUR: '€',
-                    GBP: '£',
-                    INR: '₹',
-                    AED: 'د.إ',
-                    SAR: '﷼',
-                    CNY: '¥',
-                    JPY: '¥'
-                  }[selectedCurrency] || '$';
-
-                  return (
-                    <div key={index} className="pricing-package-card">
-                      <div className="package-header">
-                        <div className="package-size">{pkg.size}</div>
-                        <div className="package-moq">MOQ: {pkg.moq} units</div>
-                      </div>
-                      <div className="package-price">
-                        <span className="price-currency">{currencySymbol}</span>
-                        <span className="price-amount">{basePrice.toFixed(2)}</span>
-                        <span className="price-unit">/ liter</span>
-                      </div>
-                      <div className="package-total">
-                        {currencySymbol}{(basePrice * 100).toFixed(2)} per 100L
-                      </div>
-                      <div className="package-features">
-                        <div className="package-feature">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <polyline points="20 6 9 17 4 12" />
-                          </svg>
-                          <span>Bulk discounts available</span>
-                        </div>
-                        <div className="package-feature">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <polyline points="20 6 9 17 4 12" />
-                          </svg>
-                          <span>Fast shipping worldwide</span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Stock Availability */}
-              <div className="stock-availability">
-                <div className="stock-indicator">
-                  <div className="stock-status in-stock">
-                    <div className="stock-dot"></div>
-                    <span>In Stock</span>
-                  </div>
-                  <div className="stock-info">
-                    <strong>Available Quantity:</strong> {product.statistics?.annualCapacity || "500,000+ liters"}
-                  </div>
-                </div>
-                <div className="stock-actions">
-                  <button className="stock-btn primary">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-                      <line x1="3" y1="6" x2="21" y2="6" />
-                      <path d="M16 10a4 4 0 0 1-8 0" />
-                    </svg>
-                    Request Quote
-                  </button>
-                  <button className="stock-btn secondary">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                    </svg>
-                    Contact Sales
-                  </button>
-                </div>
+              <div className="pricing-note">
+                <p><strong>Note:</strong> Prices are for {product.pricing.thickness || 't=3mm'} thickness. Currency conversions are approximate and may vary.</p>
               </div>
             </div>
           </section>
@@ -719,56 +662,102 @@ export default function ProductDetailPage() {
           <div className="product-section-container">
             <h2 className="product-section-title">Global Availability</h2>
             <p className="product-section-subtitle">
-              Our {product.name} is available and exported to 15+ countries worldwide
+              Our {product.name} is available and exported to {product.statistics?.exportCountries || '25+ countries'} worldwide
             </p>
             
             <div className="availability-map-wrapper">
               <div className="availability-regions">
-                <div className="region-card">
-                  <div className="region-icon">🌏</div>
-                  <h3>Asia Pacific</h3>
-                  <div className="region-countries">
-                    <span className="country-tag">India</span>
-                    <span className="country-tag">China</span>
-                    <span className="country-tag">Japan</span>
-                    <span className="country-tag">Singapore</span>
-                    <span className="country-tag">Malaysia</span>
-                    <span className="country-tag">Thailand</span>
-                  </div>
-                </div>
-                <div className="region-card">
-                  <div className="region-icon">🌍</div>
-                  <h3>Middle East</h3>
-                  <div className="region-countries">
-                    <span className="country-tag">UAE</span>
-                    <span className="country-tag">Saudi Arabia</span>
-                    <span className="country-tag">Qatar</span>
-                    <span className="country-tag">Kuwait</span>
-                  </div>
-                </div>
-                <div className="region-card">
-                  <div className="region-icon">🌎</div>
-                  <h3>Africa</h3>
-                  <div className="region-countries">
-                    <span className="country-tag">Kenya</span>
-                    <span className="country-tag">Nigeria</span>
-                    <span className="country-tag">South Africa</span>
-                    <span className="country-tag">Ghana</span>
-                  </div>
-                </div>
-                <div className="region-card">
-                  <div className="region-icon">🌐</div>
-                  <h3>Europe</h3>
-                  <div className="region-countries">
-                    <span className="country-tag">UK</span>
-                    <span className="country-tag">Germany</span>
-                    <span className="country-tag">France</span>
-                  </div>
-                </div>
+                {/* Check if product has structured globalAvailability data */}
+                {product.globalAvailability && product.globalAvailability.regions ? (
+                  // Use dynamic data from product with country flags
+                  product.globalAvailability.regions.map((region, index) => {
+                    const regionIcons = {
+                      'North America': '🌎',
+                      'Europe': '🇪🇺',
+                      'Asia / Asia Pacific': '🌏',
+                      'Asia Pacific': '🌏',
+                      'Latin America': '🌎',
+                      'Middle East & Africa': '🌍',
+                      'Oceania': '🌏'
+                    };
+                    // Country to flag mapping
+                    const countryFlags = {
+                      'United States': '🇺🇸', 'Canada': '🇨🇦', 'Mexico': '🇲🇽',
+                      'Germany': '🇩🇪', 'United Kingdom': '🇬🇧', 'France': '🇫🇷', 
+                      'Italy': '🇮🇹', 'Spain': '🇪🇸', 'Other EU countries': '🇪🇺',
+                      'China': '🇨🇳', 'India': '🇮🇳', 'Japan': '🇯🇵', 
+                      'South Korea': '🇰🇷', 'Australia': '🇦🇺', 'Indonesia': '🇮🇩',
+                      'Thailand': '🇹🇭', 'Malaysia': '🇲🇾', 'Singapore': '🇸🇬',
+                      'Brazil': '🇧🇷', 'Argentina': '🇦🇷', 'Colombia': '🇨🇴',
+                      'Saudi Arabia': '🇸🇦', 'United Arab Emirates': '🇦🇪', 
+                      'South Africa': '🇿🇦', 'Qatar': '🇶🇦', 'Kuwait': '🇰🇼',
+                      'New Zealand': '🇳🇿', 'UAE': '🇦🇪'
+                    };
+                    return (
+                      <div key={index} className="region-card">
+                        <div className="region-icon">{regionIcons[region.name] || '🌐'}</div>
+                        <h3>{region.name}</h3>
+                        <div className="region-countries">
+                          {region.countries.map((country, countryIndex) => (
+                            <span key={countryIndex} className="country-tag">
+                              <span className="country-flag">{countryFlags[country] || '🏳️'}</span>
+                              {country}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  // Fallback to default regions with flags
+                  <>
+                    <div className="region-card">
+                      <div className="region-icon">🌏</div>
+                      <h3>Asia Pacific</h3>
+                      <div className="region-countries">
+                        <span className="country-tag"><span className="country-flag">🇮🇳</span>India</span>
+                        <span className="country-tag"><span className="country-flag">🇨🇳</span>China</span>
+                        <span className="country-tag"><span className="country-flag">🇯🇵</span>Japan</span>
+                        <span className="country-tag"><span className="country-flag">🇸🇬</span>Singapore</span>
+                        <span className="country-tag"><span className="country-flag">🇲🇾</span>Malaysia</span>
+                        <span className="country-tag"><span className="country-flag">🇹🇭</span>Thailand</span>
+                      </div>
+                    </div>
+                    <div className="region-card">
+                      <div className="region-icon">🌍</div>
+                      <h3>Middle East</h3>
+                      <div className="region-countries">
+                        <span className="country-tag"><span className="country-flag">🇦🇪</span>UAE</span>
+                        <span className="country-tag"><span className="country-flag">🇸🇦</span>Saudi Arabia</span>
+                        <span className="country-tag"><span className="country-flag">🇶🇦</span>Qatar</span>
+                        <span className="country-tag"><span className="country-flag">🇰🇼</span>Kuwait</span>
+                      </div>
+                    </div>
+                    <div className="region-card">
+                      <div className="region-icon">🌎</div>
+                      <h3>Africa</h3>
+                      <div className="region-countries">
+                        <span className="country-tag"><span className="country-flag">🇰🇪</span>Kenya</span>
+                        <span className="country-tag"><span className="country-flag">🇳🇬</span>Nigeria</span>
+                        <span className="country-tag"><span className="country-flag">🇿🇦</span>South Africa</span>
+                        <span className="country-tag"><span className="country-flag">🇬🇭</span>Ghana</span>
+                      </div>
+                    </div>
+                    <div className="region-card">
+                      <div className="region-icon">🌐</div>
+                      <h3>Europe</h3>
+                      <div className="region-countries">
+                        <span className="country-tag"><span className="country-flag">🇬🇧</span>UK</span>
+                        <span className="country-tag"><span className="country-flag">🇩🇪</span>Germany</span>
+                        <span className="country-tag"><span className="country-flag">🇫🇷</span>France</span>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
               <div className="availability-stats">
                 <div className="availability-stat">
-                  <div className="stat-number">15+</div>
+                  <div className="stat-number">{product.statistics?.exportCountries?.replace(/[^\d+]/g, '') || '25+'}</div>
                   <div className="stat-text">Countries</div>
                 </div>
                 <div className="availability-stat">
@@ -790,22 +779,12 @@ export default function ProductDetailPage() {
             <div className="product-section-container">
               <h2 className="product-section-title">Product Specification</h2>
               <p className="product-section-subtitle">
-                Comprehensive technical details, key features, and product advantages
+                Key features and product advantages of our W Beam Crash Barriers
               </p>
               
-              {/* Tabs */}
+              {/* Tabs - Key Features and Product Advantages only */}
               <div className="specs-tabs-wrapper">
                 <div className="specs-tabs">
-                  <button
-                    className={`specs-tab ${activeSpecTab === "technical" ? "active" : ""}`}
-                    onClick={() => setActiveSpecTab("technical")}
-                  >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                      <path d="M2 17l10 5 10-5M2 12l10 5 10-5" />
-                    </svg>
-                    <span>Technical Details</span>
-                  </button>
                   <button
                     className={`specs-tab ${activeSpecTab === "keyFeatures" ? "active" : ""}`}
                     onClick={() => setActiveSpecTab("keyFeatures")}
@@ -840,35 +819,17 @@ export default function ProductDetailPage() {
                     />
                     <div className="specs-image-overlay" />
                     <div className="specs-image-badge">
-                      {activeSpecTab === "technical" ? "Technical" :
-                       activeSpecTab === "keyFeatures" ? "Features" : "Advantages"}
+                      {activeSpecTab === "keyFeatures" ? "Features" : "Advantages"}
                     </div>
                   </div>
                 </div>
                 <div className="specs-list-container">
                   <div className="specs-list-header">
                     <h3>
-                      {activeSpecTab === "technical" ? "Technical Specifications" :
-                       activeSpecTab === "keyFeatures" ? "Key Features & Benefits" : "Product Advantages"}
+                      {activeSpecTab === "keyFeatures" ? "Key Features & Benefits" : "Product Advantages"}
                     </h3>
                   </div>
                   <div className="specs-list">
-                    {activeSpecTab === "technical" && product.specifications.technical && (
-                      <div className="specs-grid">
-                        {product.specifications.technical.map((spec, i) => (
-                          <div key={i} className="spec-item">
-                            <div className="spec-icon">
-                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <polyline points="20 6 9 17 4 12" />
-                              </svg>
-                            </div>
-                            <div className="spec-text">
-                              <span>{spec}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
                     {activeSpecTab === "keyFeatures" && product.specifications.keyFeatures && (
                       <div className="specs-grid">
                         {product.specifications.keyFeatures.map((spec, i) => (
@@ -915,7 +876,7 @@ export default function ProductDetailPage() {
             <div className="product-section-container">
               <h2 className="product-section-title">Application Areas</h2>
               <p className="product-section-subtitle">
-                Discover where our {product.name} is applied across various industries and sectors
+                Where our {product.name} provides maximum road safety and protection
               </p>
               
               <div className="applications-grid">
@@ -994,125 +955,147 @@ export default function ProductDetailPage() {
             <div className="product-section-container">
               <h2 className="product-section-title">Market Growth</h2>
               <p className="product-section-subtitle">
-                Industry insights and growth projections for {product.name}
+                {product.marketGrowth.title || `Industry insights and growth projections for ${product.name}`}
               </p>
-              
-              <div className="market-content">
-                <div className="market-text">
-                  <p className="market-intro">{product.marketGrowth.description}</p>
-                  
-                  {product.marketGrowth.cagr && (
-                    <div className="market-cagr-badge">
-                      <div className="cagr-icon">📈</div>
-                      <div className="cagr-content">
-                        <div className="cagr-label">CAGR</div>
-                        <div className="cagr-value">{product.marketGrowth.cagr}</div>
-                      </div>
-                    </div>
-                  )}
 
-                  {product.marketGrowth.growthFactors && (
-                    <div className="growth-factors">
-                      <h3>Key Growth Factors</h3>
-                      <div className="factors-grid">
-                        {product.marketGrowth.growthFactors.map((factor, i) => (
-                          <div key={i} className="factor-item">
-                            <div className="factor-icon">→</div>
-                            <span>{factor}</span>
+              {/* Market Statistics Cards */}
+              {product.marketGrowth.marketStats && (
+                <div className="market-stats-grid">
+                  <div className="market-stat-card">
+                    <div className="stat-icon">💰</div>
+                    <div className="stat-value">{product.marketGrowth.marketStats.currentMarketSize}</div>
+                    <div className="stat-label">Current Market Size ({product.marketGrowth.marketStats.currentYear})</div>
+                  </div>
+                  <div className="market-stat-card highlight">
+                    <div className="stat-icon">🚀</div>
+                    <div className="stat-value">{product.marketGrowth.marketStats.projectedMarketSize}</div>
+                    <div className="stat-label">Projected by {product.marketGrowth.marketStats.projectedYear}</div>
+                  </div>
+                  <div className="market-stat-card">
+                    <div className="stat-icon">📈</div>
+                    <div className="stat-value">{product.marketGrowth.cagr}</div>
+                    <div className="stat-label">CAGR Growth Rate</div>
+                  </div>
+                  <div className="market-stat-card">
+                    <div className="stat-icon">🛣️</div>
+                    <div className="stat-value">{product.marketGrowth.marketStats.highwayKmGlobal}</div>
+                    <div className="stat-label">Global Highway Km</div>
+                  </div>
+                </div>
+              )}
+
+              {/* Description */}
+              <div className="market-description-box">
+                <p>{product.marketGrowth.description}</p>
+              </div>
+
+              {/* Visualizations Grid */}
+              <div className="market-viz-grid">
+                {/* Regional Distribution Pie Chart */}
+                {product.marketGrowth.regionalDistribution && (
+                  <div className="viz-card">
+                    <h3>Regional Market Share</h3>
+                    <div className="pie-chart-wrapper">
+                      <svg className="pie-chart" viewBox="0 0 200 200">
+                        {(() => {
+                          let cumulativePercent = 0;
+                          return product.marketGrowth.regionalDistribution.map((item, index) => {
+                            const percent = item.value;
+                            const startAngle = cumulativePercent * 3.6;
+                            cumulativePercent += percent;
+                            const endAngle = cumulativePercent * 3.6;
+                            
+                            const startX = 100 + 80 * Math.cos((startAngle - 90) * Math.PI / 180);
+                            const startY = 100 + 80 * Math.sin((startAngle - 90) * Math.PI / 180);
+                            const endX = 100 + 80 * Math.cos((endAngle - 90) * Math.PI / 180);
+                            const endY = 100 + 80 * Math.sin((endAngle - 90) * Math.PI / 180);
+                            const largeArcFlag = percent > 50 ? 1 : 0;
+                            
+                            return (
+                              <path
+                                key={index}
+                                d={`M 100 100 L ${startX} ${startY} A 80 80 0 ${largeArcFlag} 1 ${endX} ${endY} Z`}
+                                fill={item.color}
+                                stroke="rgba(255,255,255,0.3)"
+                                strokeWidth="2"
+                              />
+                            );
+                          });
+                        })()}
+                        <circle cx="100" cy="100" r="40" fill="rgba(116, 6, 13, 0.9)" />
+                        <text x="100" y="95" textAnchor="middle" fill="#C9A24D" fontSize="12" fontWeight="600">Market</text>
+                        <text x="100" y="112" textAnchor="middle" fill="#F7F3EA" fontSize="14" fontWeight="800">Share</text>
+                      </svg>
+                      <div className="pie-legend">
+                        {product.marketGrowth.regionalDistribution.map((item, index) => (
+                          <div key={index} className="legend-item">
+                            <span className="legend-color" style={{ background: item.color }}></span>
+                            <span className="legend-text">{item.region}</span>
+                            <span className="legend-value">{item.value}%</span>
                           </div>
                         ))}
                       </div>
                     </div>
-                  )}
-                </div>
-                
-                <div className="market-visual">
-                  <div className="market-chart-container">
-                    <div className="chart-header">
-                      <h3>Market Growth Projection</h3>
-                      <p>2023 - 2036</p>
-                    </div>
-                    
-                    <div className="chart-wrapper">
-                      {/* Bar Chart */}
-                      <div className="bar-chart">
-                        <div className="chart-bars">
-                          <div className="chart-bar-item">
-                            <div className="bar-label">{product.marketGrowth.currentMarket.year}</div>
-                            <div className="bar-container">
-                              <div className="bar bar-2023" style={{ height: '35%' }}>
-                                <div className="bar-value">{product.marketGrowth.currentMarket.value}</div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="chart-bar-item">
-                            <div className="bar-label">{product.marketGrowth.projectedMarket.year}</div>
-                            <div className="bar-container">
-                              <div className="bar bar-2036" style={{ height: '100%' }}>
-                                <div className="bar-value">{product.marketGrowth.projectedMarket.value}</div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                  </div>
+                )}
 
-                      {/* Line Chart Overlay */}
-                      <div className="line-chart">
-                        <svg className="growth-line" viewBox="0 0 200 100" preserveAspectRatio="none">
+                {/* Year-wise Growth Bar Chart */}
+                {product.marketGrowth.yearlyGrowth && (
+                  <div className="viz-card">
+                    <h3>Market Size Growth (in Billion USD)</h3>
+                    <div className="bar-chart-wrapper">
+                      <div className="bar-chart-container">
+                        {product.marketGrowth.yearlyGrowth.map((item, index) => {
+                          const maxValue = Math.max(...product.marketGrowth.yearlyGrowth.map(y => y.value));
+                          const heightPercent = (item.value / maxValue) * 100;
+                          return (
+                            <div key={index} className="bar-item">
+                              <div className="bar-fill" style={{ height: `${heightPercent}%` }}>
+                                <span className="bar-value">${item.value}B</span>
+                              </div>
+                              <span className="bar-label">{item.year}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div className="growth-trend-line">
+                        <svg viewBox="0 0 300 100" preserveAspectRatio="none">
                           <defs>
-                            <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <linearGradient id="trendGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                               <stop offset="0%" stopColor="#C9A24D" />
-                              <stop offset="100%" stopColor="#74060D" />
+                              <stop offset="100%" stopColor="#F7F3EA" />
                             </linearGradient>
                           </defs>
-                          <path
-                            d="M 20 80 Q 60 70, 100 50 T 180 20"
-                            stroke="url(#lineGradient)"
-                            strokeWidth="3"
-                            fill="none"
-                            className="growth-path"
-                          />
+                          <path d="M 10 85 L 60 75 L 110 60 L 160 45 L 210 28 L 260 10" 
+                            stroke="url(#trendGradient)" strokeWidth="3" fill="none" strokeLinecap="round" />
                         </svg>
-                      </div>
-
-                      {/* Data Points */}
-                      <div className="chart-data-points">
-                        <div className="data-point point-2023">
-                          <div className="point-marker"></div>
-                          <div className="point-info">
-                            <div className="point-year">{product.marketGrowth.currentMarket.year}</div>
-                            <div className="point-value">{product.marketGrowth.currentMarket.value}</div>
-                          </div>
-                        </div>
-                        <div className="data-point point-2036">
-                          <div className="point-marker"></div>
-                          <div className="point-info">
-                            <div className="point-year">{product.marketGrowth.projectedMarket.year}</div>
-                            <div className="point-value">{product.marketGrowth.projectedMarket.value}</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="chart-footer">
-                      <div className="chart-legend">
-                        <div className="legend-item">
-                          <div className="legend-color" style={{ background: '#C9A24D' }}></div>
-                          <span>Current Market</span>
-                        </div>
-                        <div className="legend-item">
-                          <div className="legend-color" style={{ background: '#74060D' }}></div>
-                          <span>Projected Market</span>
-                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
 
-              {/* Additional Visualizations Grid */}
-              {product.marketGrowth && (
-                <div className="market-visualizations-grid">
+              {/* Growth Factors */}
+              {product.marketGrowth.growthFactors && Array.isArray(product.marketGrowth.growthFactors) && (
+                <div className="growth-factors">
+                  <h3>Key Growth Factors of W-Beam Crash Barriers</h3>
+                  <div className="factors-grid">
+                    {product.marketGrowth.growthFactors.map((factor, i) => (
+                      <div key={i} className="factor-item">
+                        <div className="factor-number">{String(i + 1).padStart(2, '0')}</div>
+                        <span>{factor}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* REMOVED: Additional Visualizations Grid - moved to new layout above */}
+        {false && product.marketGrowth && (
+                <div className="market-visualizations-grid-DISABLED">
                   {/* Market Segmentation Pie Chart */}
                   {product.marketGrowth.marketSegmentation && (
                     <div className="visualization-card">
@@ -1335,9 +1318,6 @@ export default function ProductDetailPage() {
                   )}
                 </div>
               )}
-            </div>
-          </section>
-        )}
 
         {/* Testing Video Section */}
         {product.testingVideo && product.testingVideo.youtubeId && (
@@ -1398,11 +1378,11 @@ export default function ProductDetailPage() {
         {product.manufacturingProcess && product.manufacturingProcess.length > 0 && (
           <section className="product-manufacturing-section">
             <div className="product-section-container">
-              <h2 className="product-section-title">Manufacturing Process</h2>
+              <h2 className="product-section-title">Manufacturing Process of MBCB</h2>
               <p className="product-section-subtitle">
-                Our {product.name} undergoes a meticulous manufacturing process, ensuring precision, durability, and adherence to stringent quality standards.
+                {product.manufacturingProcessIntro || `Our ${product.name} undergoes a meticulous manufacturing process, ensuring precision, durability, and adherence to stringent quality standards.`}
               </p>
-              
+
               <div className="manufacturing-steps">
                 {product.manufacturingProcess.map((step, index) => {
                   const isVisible = visibleSteps.has(index);
@@ -1507,8 +1487,8 @@ export default function ProductDetailPage() {
             {/* Certificates Section */}
             <div className="proof-certificates">
               <div className="certificates-header">
-                <h3>Quality Certifications</h3>
-                <p>Internationally recognized certifications and quality standards</p>
+                <h3>Quality Standards</h3>
+                <p>Compliance with national and international road safety standards</p>
               </div>
               <div className="certificates-grid">
                 <div className="certificate-card">
@@ -1518,11 +1498,11 @@ export default function ProductDetailPage() {
                       <path d="M2 17l10 5 10-5M2 12l10 5 10-5" />
                     </svg>
                   </div>
-                  <h4>ISO 9001:2015</h4>
-                  <p>Quality Management System Certification</p>
-                  <button 
+                  <h4>IS 5986</h4>
+                  <p>Indian Standard for Hot Rolled Steel Sheet Piling Sections</p>
+                  <button
                     className="certificate-view-btn"
-                    onClick={() => window.open('/certificates/iso-9001-2015.pdf', '_blank')}
+                    onClick={() => window.open('/certificates/is-5986.pdf', '_blank')}
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
@@ -1539,11 +1519,11 @@ export default function ProductDetailPage() {
                       <polyline points="22 4 12 14.01 9 11.01" />
                     </svg>
                   </div>
-                  <h4>Quality Assurance</h4>
-                  <p>Comprehensive Quality Control Standards</p>
-                  <button 
+                  <h4>MoRTH Specifications</h4>
+                  <p>Ministry of Road Transport & Highways Standards</p>
+                  <button
                     className="certificate-view-btn"
-                    onClick={() => window.open('/certificates/quality-assurance.pdf', '_blank')}
+                    onClick={() => window.open('/certificates/morth-specs.pdf', '_blank')}
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
@@ -1560,11 +1540,11 @@ export default function ProductDetailPage() {
                       <path d="M9 12l2 2 4-4" />
                     </svg>
                   </div>
-                  <h4>Export License</h4>
-                  <p>Authorized Export to 15+ Countries</p>
-                  <button 
+                  <h4>ISO 9001:2015</h4>
+                  <p>Quality Management System Certification</p>
+                  <button
                     className="certificate-view-btn"
-                    onClick={() => window.open('/certificates/export-license.pdf', '_blank')}
+                    onClick={() => window.open('/certificates/iso-9001-2015.pdf', '_blank')}
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
@@ -1582,11 +1562,11 @@ export default function ProductDetailPage() {
                       <line x1="9" y1="21" x2="9" y2="9" />
                     </svg>
                   </div>
-                  <h4>Environmental Compliance</h4>
-                  <p>Eco-Friendly Manufacturing Standards</p>
-                  <button 
+                  <h4>AASHTO M180</h4>
+                  <p>American Standard for Corrugated Steel Beam Guardrail</p>
+                  <button
                     className="certificate-view-btn"
-                    onClick={() => window.open('/certificates/environmental-compliance.pdf', '_blank')}
+                    onClick={() => window.open('/certificates/aashto-m180.pdf', '_blank')}
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
@@ -1748,29 +1728,15 @@ export default function ProductDetailPage() {
           </div>
         </section>
 
-        {/* CTA Section */}
-        <section className="product-cta-section">
-          <div className="product-cta-container">
-            <h2>Interested in {product.name}?</h2>
-            <p>Contact us for quotes, technical specifications, and custom solutions</p>
-            <div className="product-cta-buttons">
-              <Link href="/contact" className="product-cta-btn primary">
-                Get Quote
-              </Link>
-              <Link href="/contact" className="product-cta-btn secondary">
-                Download Catalogue
-              </Link>
-            </div>
-          </div>
-        </section>
-
         {/* Related Products Section */}
         {relatedProducts.length > 0 && (
           <section className="related-products-section">
             <div className="product-section-container">
               <h2 className="product-section-title">Related Products</h2>
               <p className="product-section-subtitle">
-                Discover other top-quality products from our range
+                {['cb1', 'cb2', 'cb3', 'cb4', 'cb5'].includes(product.id) 
+                  ? 'Explore other Metal Beam Crash Barrier (MBCB) products from our range'
+                  : 'Discover other top-quality products from our range'}
               </p>
               
               <div className="related-products-grid">
@@ -2016,6 +1982,74 @@ export default function ProductDetailPage() {
           margin: 0;
         }
 
+        /* Overview Specs Table */
+        .overview-specs-table {
+          margin-top: 40px;
+          border-radius: 16px;
+          overflow: hidden;
+          border: 2px solid #E6D3A3;
+          background: linear-gradient(135deg, rgba(116, 6, 13, 0.02), rgba(201, 162, 77, 0.02));
+        }
+
+        .overview-specs-table table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+
+        .overview-specs-table thead tr {
+          background: linear-gradient(135deg, #74060D, #9A1B2E);
+        }
+
+        .overview-specs-table th {
+          padding: 18px 24px;
+          text-align: left;
+          font-size: 16px;
+          font-weight: 700;
+          color: #F7F3EA;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+
+        .overview-specs-table th:first-child {
+          width: 40%;
+        }
+
+        .overview-specs-table tbody tr {
+          border-bottom: 1px solid #E6D3A3;
+          transition: all 0.3s ease;
+        }
+
+        .overview-specs-table tbody tr:last-child {
+          border-bottom: none;
+        }
+
+        .overview-specs-table tbody tr:hover {
+          background: linear-gradient(135deg, rgba(116, 6, 13, 0.05), rgba(201, 162, 77, 0.05));
+        }
+
+        .overview-specs-table td {
+          padding: 16px 24px;
+          font-size: 15px;
+          color: #1a2744;
+        }
+
+        .overview-specs-table td:first-child {
+          font-weight: 600;
+          color: #74060D;
+        }
+
+        @media (max-width: 768px) {
+          .overview-specs-table th,
+          .overview-specs-table td {
+            padding: 12px 16px;
+            font-size: 14px;
+          }
+
+          .overview-specs-table th:first-child {
+            width: 45%;
+          }
+        }
+
         /* Pricing Section */
         .product-pricing-section {
           padding: 80px 0;
@@ -2070,6 +2104,305 @@ export default function ProductDetailPage() {
           color: #F7F3EA;
           border-color: #C9A24D;
           box-shadow: 0 8px 25px rgba(116, 6, 13, 0.3);
+        }
+
+        /* Multi-Currency Pricing Grid - 7x2 layout */
+        .multi-currency-pricing-grid {
+          display: grid;
+          grid-template-columns: repeat(7, 1fr);
+          gap: 14px;
+          margin-bottom: 30px;
+        }
+
+        .currency-price-card {
+          background: white;
+          border-radius: 14px;
+          padding: 16px 12px;
+          text-align: center;
+          border: 2px solid #E6D3A3;
+          transition: all 0.3s ease;
+        }
+
+        .currency-price-card:hover {
+          transform: translateY(-3px);
+          border-color: #C9A24D;
+          box-shadow: 0 8px 20px rgba(116, 6, 13, 0.12);
+        }
+
+        .currency-price-card.highlighted {
+          background: linear-gradient(135deg, #74060D, #9A1B2E);
+          border-color: #C9A24D;
+          box-shadow: 0 8px 25px rgba(116, 6, 13, 0.25);
+        }
+
+        .currency-flag-icon {
+          font-size: 32px;
+          margin-bottom: 8px;
+          line-height: 1;
+        }
+
+        .currency-code-badge {
+          margin-bottom: 8px;
+        }
+
+        .currency-code {
+          display: inline-block;
+          padding: 4px 12px;
+          background: linear-gradient(135deg, #C9A24D, #E6D3A3);
+          color: #74060D;
+          font-size: 11px;
+          font-weight: 800;
+          border-radius: 20px;
+          letter-spacing: 0.05em;
+        }
+
+        .currency-price-card.highlighted .currency-code {
+          background: rgba(255, 255, 255, 0.2);
+          color: #F7F3EA;
+        }
+
+        .currency-price {
+          display: flex;
+          align-items: baseline;
+          justify-content: center;
+          gap: 2px;
+          margin-bottom: 4px;
+        }
+
+        .currency-symbol {
+          font-size: 14px;
+          font-weight: 700;
+          color: #C9A24D;
+        }
+
+        .currency-price-card.highlighted .currency-symbol {
+          color: #E6D3A3;
+        }
+
+        .currency-amount {
+          font-size: 22px;
+          font-weight: 800;
+          color: #74060D;
+        }
+
+        .currency-price-card.highlighted .currency-amount {
+          color: #F7F3EA;
+        }
+
+        .currency-unit {
+          font-size: 9px;
+          color: #9A1B2E;
+          font-weight: 600;
+          margin-bottom: 4px;
+        }
+
+        .currency-price-card.highlighted .currency-unit {
+          color: #E6D3A3;
+        }
+
+        .currency-name {
+          font-size: 9px;
+          color: #5a4a4a;
+          text-transform: uppercase;
+          letter-spacing: 0.03em;
+          font-weight: 600;
+        }
+
+        .currency-price-card.highlighted .currency-name {
+          color: rgba(255, 255, 255, 0.8);
+        }
+
+        .pricing-note {
+          background: linear-gradient(135deg, rgba(116, 6, 13, 0.05), rgba(201, 162, 77, 0.05));
+          border-radius: 12px;
+          padding: 16px 24px;
+          border: 1px solid #E6D3A3;
+        }
+
+        .pricing-note p {
+          font-size: 14px;
+          color: #5a4a4a;
+          margin: 0;
+          line-height: 1.6;
+        }
+
+        .pricing-note strong {
+          color: #74060D;
+        }
+
+        @media (max-width: 1200px) {
+          .multi-currency-pricing-grid {
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+          }
+
+          .currency-price-card {
+            padding: 14px 8px;
+          }
+
+          .currency-amount {
+            font-size: 18px;
+          }
+
+          .currency-flag-icon {
+            font-size: 28px;
+          }
+        }
+
+        @media (max-width: 992px) {
+          .multi-currency-pricing-grid {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+          }
+
+          .currency-amount {
+            font-size: 20px;
+          }
+
+          .currency-flag-icon {
+            font-size: 30px;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .multi-currency-pricing-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+          }
+
+          .currency-price-card {
+            padding: 12px 8px;
+          }
+
+          .currency-amount {
+            font-size: 18px;
+          }
+
+          .currency-flag-icon {
+            font-size: 26px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .multi-currency-pricing-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+
+          .currency-amount {
+            font-size: 20px;
+          }
+
+          .currency-flag-icon {
+            font-size: 28px;
+          }
+        }
+
+        /* Featured Price Card for INR-based products - DEPRECATED */
+        .featured-price-card {
+          max-width: 600px;
+          margin: 0 auto 50px;
+          background: linear-gradient(135deg, #74060D 0%, #9A1B2E 100%);
+          border-radius: 24px;
+          padding: 40px;
+          position: relative;
+          overflow: hidden;
+          box-shadow: 0 20px 60px rgba(116, 6, 13, 0.3);
+        }
+
+        .featured-price-card::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(ellipse at top right, rgba(201, 162, 77, 0.3) 0%, transparent 60%);
+        }
+
+        .featured-price-header {
+          position: relative;
+          z-index: 2;
+          text-align: center;
+          margin-bottom: 30px;
+        }
+
+        .featured-price-badge {
+          display: inline-block;
+          background: linear-gradient(135deg, #C9A24D, #E6D3A3);
+          color: #74060D;
+          padding: 8px 20px;
+          border-radius: 30px;
+          font-size: 12px;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          margin-bottom: 16px;
+        }
+
+        .featured-price-header h3 {
+          font-size: 28px;
+          font-weight: 800;
+          color: #F7F3EA;
+          margin: 0 0 8px;
+        }
+
+        .price-thickness {
+          font-size: 14px;
+          color: #E6D3A3;
+          margin: 0;
+        }
+
+        .featured-price-main {
+          position: relative;
+          z-index: 2;
+          display: flex;
+          align-items: baseline;
+          justify-content: center;
+          gap: 8px;
+          margin-bottom: 30px;
+          padding: 30px;
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 16px;
+          backdrop-filter: blur(10px);
+        }
+
+        .featured-price-main .price-currency {
+          font-size: 32px;
+          font-weight: 700;
+          color: #E6D3A3;
+        }
+
+        .featured-price-main .price-amount {
+          font-size: 56px;
+          font-weight: 800;
+          color: #F7F3EA;
+        }
+
+        .featured-price-main .price-unit {
+          font-size: 16px;
+          font-weight: 600;
+          color: #E6D3A3;
+        }
+
+        .featured-price-features {
+          position: relative;
+          z-index: 2;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .price-feature {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          font-size: 14px;
+          color: #F7F3EA;
+          padding: 12px 16px;
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 12px;
+        }
+
+        .price-feature svg {
+          color: #C9A24D;
+          flex-shrink: 0;
         }
 
         .pricing-packages-grid {
@@ -2276,7 +2609,7 @@ export default function ProductDetailPage() {
 
         .availability-regions {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          grid-template-columns: repeat(3, 1fr);
           gap: 24px;
           margin-bottom: 40px;
         }
@@ -2284,7 +2617,7 @@ export default function ProductDetailPage() {
         .region-card {
           background: linear-gradient(135deg, rgba(116, 6, 13, 0.05), rgba(201, 162, 77, 0.05));
           border-radius: 20px;
-          padding: 30px;
+          padding: 28px;
           border: 2px solid #E6D3A3;
           transition: all 0.4s ease;
         }
@@ -2296,32 +2629,40 @@ export default function ProductDetailPage() {
         }
 
         .region-icon {
-          font-size: 48px;
-          margin-bottom: 16px;
+          font-size: 42px;
+          margin-bottom: 14px;
         }
 
         .region-card h3 {
-          font-size: 22px;
+          font-size: 20px;
           font-weight: 700;
           color: #74060D;
-          margin: 0 0 20px;
+          margin: 0 0 16px;
         }
 
         .region-countries {
           display: flex;
           flex-wrap: wrap;
-          gap: 10px;
+          gap: 8px;
         }
 
         .country-tag {
-          padding: 8px 16px;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 6px 12px;
           background: white;
           border: 1px solid #E6D3A3;
           border-radius: 20px;
-          font-size: 13px;
+          font-size: 12px;
           font-weight: 600;
           color: #9A1B2E;
           transition: all 0.3s ease;
+        }
+
+        .country-flag {
+          font-size: 14px;
+          line-height: 1;
         }
 
         .country-tag:hover {
@@ -2329,6 +2670,12 @@ export default function ProductDetailPage() {
           color: #74060D;
           border-color: #C9A24D;
           transform: scale(1.05);
+        }
+
+        @media (max-width: 992px) {
+          .availability-regions {
+            grid-template-columns: repeat(2, 1fr);
+          }
         }
 
         .availability-stats {
@@ -2617,8 +2964,8 @@ export default function ProductDetailPage() {
 
         .applications-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-          gap: 30px;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 28px;
         }
 
         .application-card {
@@ -2629,16 +2976,18 @@ export default function ProductDetailPage() {
           box-shadow: 0 8px 30px rgba(116, 6, 13, 0.1);
           transition: all 0.4s ease;
           cursor: pointer;
+          border: 2px solid transparent;
         }
 
         .application-card:hover {
           transform: translateY(-10px);
           box-shadow: 0 20px 50px rgba(116, 6, 13, 0.2);
+          border-color: #C9A24D;
         }
 
         .application-image {
           position: relative;
-          height: 250px;
+          height: 200px;
         }
 
         .application-overlay {
@@ -2648,35 +2997,53 @@ export default function ProductDetailPage() {
         }
 
         .application-content {
-          padding: 30px;
+          padding: 24px;
           position: relative;
         }
 
         .application-content h3 {
-          font-size: 22px;
+          font-size: 20px;
           font-weight: 700;
           color: #74060D;
-          margin: 0 0 12px;
+          margin: 0 0 10px;
         }
 
         .application-content > p {
-          font-size: 15px;
+          font-size: 14px;
           color: #5a4a4a;
-          line-height: 1.7;
-          margin: 0 0 16px;
+          line-height: 1.6;
+          margin: 0;
         }
 
         .application-details {
-          margin-top: 16px;
-          padding-top: 16px;
+          margin-top: 14px;
+          padding-top: 14px;
           border-top: 2px solid #E6D3A3;
+          animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
         }
 
         .application-details p {
-          font-size: 14px;
+          font-size: 13px;
           color: #1a2744;
-          line-height: 1.8;
+          line-height: 1.7;
           margin: 0;
+        }
+
+        @media (max-width: 992px) {
+          .applications-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+
+        @media (max-width: 600px) {
+          .applications-grid {
+            grid-template-columns: 1fr;
+          }
         }
 
         /* Projects Section */
@@ -2764,8 +3131,286 @@ export default function ProductDetailPage() {
 
         .product-market-section .product-section-subtitle {
           color: #E6D3A3;
+          max-width: 700px;
+          margin-left: auto;
+          margin-right: auto;
         }
 
+        /* Market Statistics Grid */
+        .market-stats-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 20px;
+          margin-bottom: 40px;
+        }
+
+        .market-stat-card {
+          background: rgba(255, 255, 255, 0.1);
+          backdrop-filter: blur(10px);
+          border-radius: 16px;
+          padding: 24px;
+          text-align: center;
+          border: 2px solid rgba(201, 162, 77, 0.2);
+          transition: all 0.3s ease;
+        }
+
+        .market-stat-card:hover {
+          transform: translateY(-5px);
+          border-color: #C9A24D;
+        }
+
+        .market-stat-card.highlight {
+          background: linear-gradient(135deg, #C9A24D, #E6D3A3);
+          border-color: #C9A24D;
+        }
+
+        .market-stat-card.highlight .stat-value,
+        .market-stat-card.highlight .stat-label {
+          color: #74060D;
+        }
+
+        .market-stat-card .stat-icon {
+          font-size: 32px;
+          margin-bottom: 12px;
+        }
+
+        .market-stat-card .stat-value {
+          font-size: 28px;
+          font-weight: 800;
+          color: #F7F3EA;
+          margin-bottom: 8px;
+        }
+
+        .market-stat-card .stat-label {
+          font-size: 12px;
+          color: #E6D3A3;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+
+        /* Market Description Box */
+        .market-description-box {
+          background: rgba(255, 255, 255, 0.08);
+          border-radius: 16px;
+          padding: 30px;
+          margin-bottom: 40px;
+          border-left: 4px solid #C9A24D;
+        }
+
+        .market-description-box p {
+          font-size: 16px;
+          line-height: 1.8;
+          color: #E6D3A3;
+          margin: 0;
+        }
+
+        /* Visualizations Grid */
+        .market-viz-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 30px;
+          margin-bottom: 40px;
+        }
+
+        .viz-card {
+          background: rgba(255, 255, 255, 0.1);
+          backdrop-filter: blur(10px);
+          border-radius: 20px;
+          padding: 30px;
+          border: 2px solid rgba(201, 162, 77, 0.2);
+        }
+
+        .viz-card h3 {
+          font-size: 18px;
+          font-weight: 700;
+          color: #F7F3EA;
+          margin: 0 0 24px;
+          text-align: center;
+        }
+
+        /* Pie Chart Styles */
+        .pie-chart-wrapper {
+          display: flex;
+          align-items: center;
+          gap: 30px;
+        }
+
+        .pie-chart {
+          width: 180px;
+          height: 180px;
+          flex-shrink: 0;
+        }
+
+        .pie-legend {
+          flex: 1;
+        }
+
+        .pie-legend .legend-item {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 10px;
+          font-size: 13px;
+        }
+
+        .pie-legend .legend-color {
+          width: 14px;
+          height: 14px;
+          border-radius: 4px;
+          flex-shrink: 0;
+        }
+
+        .pie-legend .legend-text {
+          flex: 1;
+          color: #E6D3A3;
+        }
+
+        .pie-legend .legend-value {
+          font-weight: 700;
+          color: #F7F3EA;
+        }
+
+        /* Bar Chart Styles */
+        .bar-chart-wrapper {
+          position: relative;
+        }
+
+        .bar-chart-container {
+          display: flex;
+          align-items: flex-end;
+          justify-content: space-between;
+          height: 200px;
+          padding: 0 10px;
+          border-bottom: 2px solid rgba(201, 162, 77, 0.3);
+        }
+
+        .bar-item {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          flex: 1;
+          max-width: 50px;
+        }
+
+        .bar-fill {
+          width: 36px;
+          background: linear-gradient(180deg, #C9A24D 0%, #E6D3A3 100%);
+          border-radius: 6px 6px 0 0;
+          display: flex;
+          justify-content: center;
+          padding-top: 8px;
+          min-height: 30px;
+          transition: all 0.3s ease;
+        }
+
+        .bar-item:hover .bar-fill {
+          background: linear-gradient(180deg, #F7F3EA 0%, #C9A24D 100%);
+        }
+
+        .bar-fill .bar-value {
+          font-size: 10px;
+          font-weight: 700;
+          color: #74060D;
+          white-space: nowrap;
+        }
+
+        .bar-item .bar-label {
+          margin-top: 10px;
+          font-size: 12px;
+          color: #E6D3A3;
+          font-weight: 600;
+        }
+
+        .growth-trend-line {
+          position: absolute;
+          top: 20px;
+          left: 20px;
+          right: 20px;
+          height: 100px;
+          pointer-events: none;
+        }
+
+        .growth-trend-line svg {
+          width: 100%;
+          height: 100%;
+        }
+
+        /* Growth Factors */
+        .growth-factors {
+          margin-top: 20px;
+        }
+
+        .growth-factors h3 {
+          font-size: 22px;
+          font-weight: 700;
+          color: #F7F3EA;
+          margin: 0 0 24px;
+          text-align: center;
+        }
+
+        .factors-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 16px;
+        }
+
+        .factor-item {
+          display: flex;
+          align-items: flex-start;
+          gap: 14px;
+          font-size: 14px;
+          line-height: 1.6;
+          color: #E6D3A3;
+          padding: 18px 20px;
+          background: rgba(255, 255, 255, 0.08);
+          border-radius: 12px;
+          border: 1px solid rgba(201, 162, 77, 0.2);
+          transition: all 0.3s ease;
+        }
+
+        .factor-item:hover {
+          background: rgba(255, 255, 255, 0.12);
+          border-color: rgba(201, 162, 77, 0.4);
+          transform: translateX(5px);
+        }
+
+        .factor-number {
+          font-size: 18px;
+          font-weight: 800;
+          color: #C9A24D;
+          min-width: 30px;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+          .market-stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+
+          .market-viz-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .pie-chart-wrapper {
+            flex-direction: column;
+          }
+
+          .factors-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        @media (max-width: 600px) {
+          .market-stats-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .market-stat-card .stat-value {
+            font-size: 24px;
+          }
+        }
+
+        /* Legacy chart styles - keeping for backward compatibility */
         .market-content {
           display: grid;
           grid-template-columns: 1fr 1.2fr;
@@ -2781,84 +3426,6 @@ export default function ProductDetailPage() {
           font-size: 18px;
           line-height: 1.9;
           margin: 0 0 40px;
-        }
-
-        .market-cagr-badge {
-          display: flex;
-          align-items: center;
-          gap: 20px;
-          background: rgba(255, 255, 255, 0.15);
-          backdrop-filter: blur(10px);
-          padding: 25px;
-          border-radius: 20px;
-          border: 2px solid rgba(201, 162, 77, 0.3);
-          margin-bottom: 40px;
-        }
-
-        .cagr-icon {
-          font-size: 48px;
-        }
-
-        .cagr-content {
-          flex: 1;
-        }
-
-        .cagr-label {
-          font-size: 14px;
-          font-weight: 600;
-          color: #C9A24D;
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          margin-bottom: 8px;
-        }
-
-        .cagr-value {
-          font-size: 32px;
-          font-weight: 800;
-          color: #F7F3EA;
-        }
-
-        .growth-factors {
-          margin-bottom: 30px;
-        }
-
-        .growth-factors h3 {
-          font-size: 24px;
-          font-weight: 700;
-          color: #F7F3EA;
-          margin: 0 0 24px;
-        }
-
-        .factors-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-          gap: 16px;
-        }
-
-        .factor-item {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          font-size: 15px;
-          line-height: 1.6;
-          color: #E6D3A3;
-          padding: 14px 18px;
-          background: rgba(255, 255, 255, 0.08);
-          border-radius: 12px;
-          border: 1px solid rgba(201, 162, 77, 0.2);
-          transition: all 0.3s ease;
-        }
-
-        .factor-item:hover {
-          background: rgba(255, 255, 255, 0.12);
-          border-color: rgba(201, 162, 77, 0.4);
-          transform: translateX(5px);
-        }
-
-        .factor-icon {
-          font-size: 20px;
-          color: #C9A24D;
-          font-weight: 700;
         }
 
         .market-visual {

@@ -680,7 +680,12 @@ With over 10 years of proven performance in various projects across India and in
 
 // Export helper functions
 export function getProductById(id) {
-  return enhancedProductsData[id] || null;
+  // Try to find by id first
+  if (enhancedProductsData[id]) {
+    return enhancedProductsData[id];
+  }
+  // If not found, try to find by slug
+  return Object.values(enhancedProductsData).find((p) => p.slug === id) || null;
 }
 
 export function getAllProducts() {

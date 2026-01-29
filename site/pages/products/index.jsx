@@ -16,10 +16,11 @@ export function getAllProducts() {
   return getAllProductsFromCategories();
 }
 
-// Helper function to get product by ID
+// Helper function to get product by ID or slug
 export function getProductById(id) {
   const allProducts = getAllProducts();
-  return allProducts.find((p) => p.id === id);
+  // Try to find by slug first, then by id
+  return allProducts.find((p) => p.slug === id || p.id === id);
 }
 
 // Get all products (enhanced + legacy)
@@ -57,7 +58,9 @@ export default function ProductsPage() {
   };
 
   const handleProductClick = (product) => {
-    router.push(`/products/${product.id}`);
+    // Use slug if available, otherwise fall back to id
+    const route = product.slug ? `/products/${product.slug}` : `/products/${product.id}`;
+    router.push(route);
   };
 
   // Get all categories
